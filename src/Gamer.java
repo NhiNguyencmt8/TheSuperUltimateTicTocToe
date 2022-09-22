@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 public class Gamer {
     private final File movefile = new File("ref\\move_file");
+    private final File playerfile = new File("ref\\walrus");
 
     private String ourName;
     private int nextBoard;
@@ -54,7 +55,7 @@ public class Gamer {
 
     public int[] getMove() throws FileNotFoundException {
         //need to check null
-        while (!movefile.exists()) {
+        while (!movefile.exists() || !playerfile.exists()) {
         }
 
         Scanner move = new Scanner(movefile);
