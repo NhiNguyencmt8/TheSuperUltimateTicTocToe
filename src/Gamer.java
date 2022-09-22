@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Gamer {
     private final File movefile = new File("ref\\move_file");
-    private final File playerfile = new File("ref\\walrus");
+    private final File playerfile = new File("ref\\walrus.go");
 
     private String ourName;
     private int nextBoard;
@@ -101,9 +101,13 @@ public class Gamer {
         //Printing the original 9x9 board with annotation 1 as our move and 2 as our player's move
         updateBoard(); // Update the board before printing
         StringBuilder board = new StringBuilder();
+
+        //Converting the board,spot -> x,y in board coordinates
+
+
         for(int i = 0; i < gameBoard.length; i++) {
             board.append("[");
-
+            //Put the move on the board
             for(int j = 0; j < gameBoard[0].length; j++) {
                 board.append(gameBoard[i][j]);
                 if(j != 8) { board.append(","); }
