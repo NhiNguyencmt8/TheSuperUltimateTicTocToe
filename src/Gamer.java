@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Gamer {
     private final File movefile = new File("ref\\move_file");
-    private final File playerfile = new File("ref\\walrus");
+    private final File playerfile = new File("ref\\walrus.go");
 
     private String ourName;
     private int nextBoard;
@@ -105,6 +105,7 @@ public class Gamer {
     public String displayBoard() {
         //Printing the original 9x9 board with annotation 1 as our move and 2 as our player's move
         updateBoard(); // Update the board before printing
+        
         String border = "---------------------\n";
         String row0 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][0],gameBoard[0][1],gameBoard[0][2],gameBoard[1][0],gameBoard[1][1],gameBoard[1][2],gameBoard[2][0],gameBoard[2][1],gameBoard[2][2]);
         String row1 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][3],gameBoard[0][4],gameBoard[0][5],gameBoard[1][3],gameBoard[1][4],gameBoard[1][5],gameBoard[2][3],gameBoard[2][4],gameBoard[2][5]);
@@ -128,6 +129,7 @@ public class Gamer {
         return row0 + row1 + row2 + border +
                 row3 + row4 + row5 + border +
                 row6 + row7 + row8;
+
     }
 
     public void ourMove() throws FileNotFoundException{

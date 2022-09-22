@@ -6,8 +6,8 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         Gamer play = new Gamer("Walrus");
         //System.out.println(play.legalMove(4,6));
-        play.getMove();
-      /*  System.out.println(play.displayBoard());
+        System.out.println(play.displayBoard());
+
         try {
             //play.sendMove("Walrus", play.randMove(), play.randMove());
             int[] recMove = play.getMove();
@@ -18,6 +18,6 @@ public class Main {
             }
         } catch(Exception e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }
