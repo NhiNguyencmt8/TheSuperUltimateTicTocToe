@@ -8,13 +8,21 @@ public class Gamer {
     private final File playerfile = new File("ref\\walrus.go");
 
     private String ourName;
-    private int nextBoard;
-    private int nextSpot;
     private int[][] gameBoard;
+    private int[] boardWinState; //1x9 matrix that indicates the win state of the big board
 
     public Gamer(String ourName) {
         this.ourName = ourName;
         gameBoard = new int[9][9];//Board-Spot?
+        boardWinState = new int[9];
+    }
+
+    /**
+     * Retrieve the value of ourName
+     * @return ourName
+     */
+    public String getOurName() {
+        return ourName;
     }
 
     /**
@@ -30,29 +38,75 @@ public class Gamer {
         int board = move[1];
         int spot = move[2];
 
-        if (legalMove(board, spot)){
-            gameBoard[board][spot] = player;
-        }
+        //Update the move on our board
+        gameBoard[board][spot] = player;
+        displayBoard();
         return true;
     }
-    //Generate a random move and rewrite an existed file
+
+    /**
+     * Generates an int for a random move
+     * @return a random integer between 0 and 8
+     */
     public int randMove() {
         // random int from 0-8
         return (int) (Math.random() * 9);
     }
 
+    /**
+     * Determines the legality of a given move based on the opponent's move
+     * @param board the board our move will take place on
+     * @param spot the exact spot on that board
+     * @return true if the move can be made on the game board
+     */
     public boolean legalMove(int board, int spot) {
         //First check if the move is empty
-        boolean legal = true;
-
-        if (gameBoard[board][spot] > 0){
-            return !legal;
-        }else{
-            return legal;
+        if (isBoardWon(gameBoard[board]) == 0) {
+            if (gameBoard[board][spot] == 0 && board == getMove()[2]) {
+                return true;
+            }
+        } else if (gameBoard[board][spot] == 0) {
+                return true;
         }
+        return false;
     }
 
+    /**
+     * Checks whether a given board has been won
+     * @param board a 1x9 array representing a board
+     * @return an int representing the player that won this board, or 0 if the board is not won
+     */
+    public int isBoardWon(int[] board) {
+        //Check all row won
+        // {0,1,2}, {3,4,5}, {6,7,8}
+        for(int i = 0; i < 8; i++) {
+            if(board[i] == board[++i] && board[i] == board[++i]){
+                return board[i];
+            }
+        }
+        //Check all column won
+        // {0,3,6}, {1,4,7}, {3,5,8}
+        for(int i = 0; i < 3; i++) {
+            if(board[i] == board[i+3] && board[i+3] == board[i+6]){
+                return board[i];
+            }
+        }
 
+        //Check diagonal won
+        // {0,4,8}, {2,4,6}
+        if(board[4] == board[0] && board[4] == board[8]){
+            return board[4];
+        } else if (board[4] == board[2] && board[4] == board[6]){
+            return board[4];
+        }
+
+        return 0;
+    }
+
+    /**
+     * Retrieves the opponent's move from movefile
+     * @return an array of format {player_number, board, spot}
+     */
     public int[] getMove() {
         //need to check null
         try {
@@ -79,22 +133,34 @@ public class Gamer {
     /**
      * Writes a given move to movefile
      * @param playerName the name of the player that made the given move
-     * @param board
-     * @param spot
-     * @return
-     * @throws FileNotFoundException
+     * @param board the board our move will take place on
+     * @param spot the exact spot on that board
+     * @return a string representing the move, or a message detailing any errors
      */
-    public String sendMove(String playerName, int board, int spot) throws FileNotFoundException {
-        if (legalMove(board, spot)) {
-            String aMove = String.format("%s %s %s", playerName, randMove(), randMove());
-            PrintWriter writeMove = new PrintWriter(movefile);
-            writeMove.println(aMove);
-            writeMove.close();
-
-            return aMove;
-        } else {
-            return "Cannot Move";
+    public String sendMove(String playerName, int board, int spot) {
+        String aMove = String.format("%s %s %s", playerName, board, spot);
+        while(!legalMove(board,spot)){
+            board = randMove();
+            spot = randMove();
+            System.out.println("No possible move, retrying");
+            System.out.println("New Board: " + board + " New Spot: " + spot);
         }
+        if (legalMove(board, spot)) {
+            aMove = String.format("%s %s %s", playerName, board, spot);
+            try {
+                PrintWriter writeMove = new PrintWriter(movefile);
+                writeMove.println(aMove);
+                writeMove.close();
+
+            } catch (FileNotFoundException e) {
+                return "Move not sent";
+            }
+
+        } else {
+
+            System.out.println("No possible move");
+        }
+        return aMove;
     }
 
     /**
@@ -117,37 +183,38 @@ public class Gamer {
         String row7 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][3],gameBoard[6][4],gameBoard[6][5],gameBoard[7][3],gameBoard[7][4],gameBoard[7][5],gameBoard[8][3],gameBoard[8][4],gameBoard[8][5]);
         String row8 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][6],gameBoard[6][7],gameBoard[6][8],gameBoard[7][6],gameBoard[7][7],gameBoard[7][8],gameBoard[8][6],gameBoard[8][7],gameBoard[8][8]);
 
-//        for(int i = 0; i < gameBoard.length; i++) {
-//            board.append("[");
-//
-//            for(int j = 0; j < gameBoard[0].length; j++) {
-//                board.append(gameBoard[i][j]);
-//                if(j != 8) { board.append(","); }
-//            }
-//            board.append("]\n");
-//        }
         return row0 + row1 + row2 + border +
                 row3 + row4 + row5 + border +
                 row6 + row7 + row8;
 
     }
+    private boolean isGameWon(){
+        //Time complexity
+        for(int i = 0; i < 9; i++){
+            boardWinState[i] = isBoardWon(gameBoard[i]);
+        }
 
-    public void ourMove() throws FileNotFoundException{
-        //Put the enemy move on our updated board
-        updateBoard();
+        if(isBoardWon(boardWinState) > 0){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Completes the program's move
+     * @param board the board the move takes place on
+     * @param spot the exact spot on that board
+     */
+    public void ourMove(int board, int spot) {
+        if (!isGameWon()){
+            //Put the enemy move on our updated board
+            updateBoard();
 
-        //Put our move on our updated board (if legal)
-        sendMove(ourName, nextBoard, nextSpot);
-        updateBoard();
+            //Put our move on our updated board (if legal)
+            sendMove(ourName, board, spot);
+            //Update our move on the board
+            updateBoard();
+        }
     }
 
-//    private int[] rowToBoard(int row, int col) {
-//        // put into new array then print
-//        int board = -1;
-//        int spot = -1;
-//        if(row >= 0 && row <= 2) {
-//            board =
-//        }
-//    }
 
 }
