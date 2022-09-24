@@ -1,0 +1,11 @@
+import org.junit.Assert;
+import org.junit.Test;
+
+public class GamerTests {
+    @Test
+    public void testTest() {
+        Gamer play = new Gamer("playa");
+        Assert.assertNotEquals(3,2);
+        Assert.assertEquals(3,3);
+    }
+}
