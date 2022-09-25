@@ -104,6 +104,19 @@ public class Gamer {
     }
 
     /**
+     * Determines the win state of each board, then determines whether a player has won the entire game
+     * @return the player number that won the game, or 0 if no player has won
+     */
+    private int isGameWon(){
+        //Time complexity
+        for(int i = 0; i < 9; i++){
+            boardWinState[i] = isBoardWon(gameBoard[i]);
+        }
+
+        return isBoardWon(boardWinState);
+    }
+
+    /**
      * Retrieves the opponent's move from movefile
      * @return an array of format {player_number, board, spot}
      */
@@ -186,26 +199,15 @@ public class Gamer {
         return row0 + row1 + row2 + border +
                 row3 + row4 + row5 + border +
                 row6 + row7 + row8;
-
     }
-    private boolean isGameWon(){
-        //Time complexity
-        for(int i = 0; i < 9; i++){
-            boardWinState[i] = isBoardWon(gameBoard[i]);
-        }
 
-        if(isBoardWon(boardWinState) > 0){
-            return true;
-        }
-        return false;
-    }
     /**
      * Completes the program's move
      * @param board the board the move takes place on
      * @param spot the exact spot on that board
      */
     public void ourMove(int board, int spot) {
-        if (!isGameWon()){
+        if (isGameWon() == 0){
             //Put the enemy move on our updated board
             updateBoard();
 

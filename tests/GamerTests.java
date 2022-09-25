@@ -4,7 +4,7 @@ import org.junit.Test;
 public class GamerTests {
     @Test
     public void testTest() {
-        Gamer play = new Gamer("playa");
+        Gamer play = new Gamer("Walrus");
         Assert.assertNotEquals(3,2);
         Assert.assertEquals(3,3);
     }

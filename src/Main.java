@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         Gamer play = new Gamer("Walrus");
         //System.out.println(play.legalMove(4,6));
         int[] opponentMove = play.getMove();
