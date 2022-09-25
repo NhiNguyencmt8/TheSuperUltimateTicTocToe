@@ -33,12 +33,26 @@ public class Strategy {
         }
     }
 
-    public int evaluate(int ourPlayer, int otherPlayer, int[] board) {
+    /**
+     * Evaluates a given board
+     * @param player the player number representing the AI
+     * @param board the board being evaluated
+     * @return a heuristic denoting the value of the board for the given player
+     */
+    public int evaluate(int player, int[] board) {
+        int otherPlayer = 0;
+        if(player == 1) { otherPlayer = 2; }
+        else { otherPlayer = 1; }
+
+        int heuristic = 0;
         for(int i = 0; i < 8; i+=3) {
             int ourp = 0; int otherp = 0;
             for(int j = i; j < i+3; j++) {
-                if(board[j] == ourPlayer) {ourp++;}
-                else if(board[j] == otherPlayer) {otherp++;}
+                if(board[j] == player) { ourp++; }
+                else if(board[j] == otherPlayer) { otherp++; }
+
+                if(ourp > otherp) { heuristic += 5; }
+                else if(otherp > ourp) { heuristic -= 5; }
             }
         }
         return 0;
