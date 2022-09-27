@@ -108,9 +108,11 @@ public class Strategy {
                 if (currentBest.hValue < bestMove.hValue){
                     bestMove = currentBest;
                 }
+                if(){
+                return bestMove;
+                }
             }
         }
-        return new Node(1,1);
     }
     //Return the ultimate spot for the move which the gamer will use
     public int minimax(int keyIndex, boolean isMax,int alpha,int beta,int depth){
