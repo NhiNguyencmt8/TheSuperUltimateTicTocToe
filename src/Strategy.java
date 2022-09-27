@@ -33,15 +33,61 @@ public class Strategy {
         }
     }
 
-    public int evaluate(int ourPlayer, int otherPlayer, int[] board) {
+    /**
+     * Evaluates a given board
+     * @param player the player number representing the AI
+     * @param board the board being evaluated
+     * @return a heuristic denoting the value of the board for the given player
+     */
+    public int evaluate(int player, int[] board) {
+        int otherPlayer = 0;
+        if(player == 1) { otherPlayer = 2; }
+        else { otherPlayer = 1; }
+
+        int heuristic = 0;
+        //all rows
         for(int i = 0; i < 8; i+=3) {
-            int ourp = 0; int otherp = 0;
+            int ourp = 0, otherp = 0;
+            //checks each spot in a row
             for(int j = i; j < i+3; j++) {
-                if(board[j] == ourPlayer) {ourp++;}
-                else if(board[j] == otherPlayer) {otherp++;}
+                if(board[j] == player) { ourp++; }
+                else if(board[j] == otherPlayer) { otherp++; }
             }
+            if(ourp > otherp) { heuristic += 5; }
+            else if(otherp > ourp) { heuristic -= 5; }
         }
-        return 0;
+
+        //all columns
+        for(int i = 0; i < 3; i++) {
+            int ourp = 0; int otherp = 0;
+            //checks each spot in a column
+            for(int j = i; j < 8; j+=3) {
+                if(board[j] == player) { ourp++; }
+                else if(board[j] == otherPlayer) { otherp++; }
+            }
+            if(ourp > otherp) { heuristic += 5; }
+            else if(otherp > ourp) { heuristic -= 5; }
+        }
+
+        //diagonal 1
+        int ourp = 0; int otherp = 0;
+        for(int i = 0; i <=8; i+=4) {
+            if(board[i] == player) { ourp++; }
+            else if(board[i] == otherPlayer) { otherp++; }
+        }
+        if(ourp > otherp) { heuristic += 5; }
+        else if(otherp > ourp) { heuristic -= 5; }
+
+        //diagonal 2
+        ourp = 0; otherp = 0;
+        for(int i = 2; i <= 6; i+=2) {
+            if(board[i] == player) { ourp++; }
+            else if(board[i] == otherPlayer) { otherp++; }
+        }
+        if(ourp > otherp) { heuristic += 5; }
+        else if(otherp > ourp) { heuristic -= 5; }
+
+        return heuristic;
     }
 
     //Rule-based strategy
@@ -57,7 +103,7 @@ public class Strategy {
     // 2 in a row + empty boxes
     // 3 in a row (WIN)
 
-    private class Node{
+    private class Node implements Comparable<Node>{
         private int hValue;
         private int spot;
         private List<Node> children;
@@ -67,6 +113,23 @@ public class Strategy {
             children = new ArrayList<Node>();
         }
 
+        // what do we want to compare for a node
+        @Override
+        public int compareTo(Node o) {
+            return 0;
+        }
+    }
+
+    public Node createNode(int board, int spot){
+        return new Node(board, spot);
+    }
+
+    public int getSpot(Node n){
+        return n.spot;
+    }
+
+    public int getBoard(Node n){
+        return n.cBoard;
     }
 
     //Put all the legal moves in the list (??)
@@ -84,10 +147,15 @@ public class Strategy {
     }
 
 
-    public Node minimax2(Node n, boolean isMax, int alpha, int beta, int depth) {
+    public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth) {
         Node currentBest;
+        if (n == null){
+            return null;
+        }
         if (n.children == null){
-            return evaluate();
+            int[] ourBoard = gameBoard[currentBoard];
+            n.hValue = evaluate(1, ourBoard);
+            return n;
         }
         if (isMax){
             Node bestMove = new Node(-100000,-1);
