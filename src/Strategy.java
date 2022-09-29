@@ -8,12 +8,16 @@ import static java.lang.Math.max;
 
 public class Strategy {
     private int[][] gameBoard;
-    private int currentBoard;
+    public int currentBoard;
     private int[] boardWinState;
+    final int MIN_VALUE = -2147483647;
+    final int MAX_VALUE = 2147483647;
+    final int INVALID_SPOT = -1;
 
     public Strategy(int[][] gameBoard, int[] boardWinState) {
         this.gameBoard = gameBoard;
         this.boardWinState = boardWinState;
+
     }
 
     /**
@@ -106,9 +110,10 @@ public class Strategy {
     private class Node implements Comparable<Node>{
         private int hValue;
         private int spot;
+        private int cBoard;
         private List<Node> children;
-        public Node(int hValue, int spot){
-            this.hValue = hValue;
+        public Node(int board, int spot) {
+            this.cBoard = board;
             this.spot = spot;
             children = new ArrayList<Node>();
         }
@@ -132,14 +137,15 @@ public class Strategy {
         return n.cBoard;
     }
 
-    //Put all the legal moves in the list (??)
+    //Put all the legal moves (spots) in the list
     //Search for all the empty cells on the board (not the big board) and put it on the list
-    private HashMap possibleMoves(){
-        HashMap pmoves = new HashMap();
+    private ArrayList<Node> possibleMoves(){
+        ArrayList<Node> pmoves = new ArrayList<>();
         int[] cBoard = gameBoard[currentBoard];
         for (int spot = 0; spot < cBoard.length; spot++){
             if(cBoard[spot] == 0){
-                pmoves.put(spot,0);
+                Node possibleNode = new Node(currentBoard,spot); //Review this after we call the function somewhere in the code
+                pmoves.add(possibleNode);
             }
         }
 
@@ -158,9 +164,10 @@ public class Strategy {
             return n;
         }
         if (isMax){
-            Node bestMove = new Node(-100000,-1);
+            Node bestMove = new Node(currentBoard,INVALID_SPOT);
+            bestMove.hValue = MIN_VALUE;
             for (Node n1 : n.children){
-                currentBest = minimax2(n1,false,alpha,beta,depth-1);
+                currentBest = minimax(n1,false,alpha,beta,depth-1);
                 if (currentBest.hValue > bestMove.hValue){
                     bestMove = currentBest;
                 }
@@ -170,52 +177,23 @@ public class Strategy {
 
             }
         }else{
-            Node bestMove = new Node(100000, -3);
+            Node bestMove = new Node(currentBoard,INVALID_SPOT);
+            bestMove.hValue = MAX_VALUE;
             for (Node n1 : n.children){
-                currentBest = minimax2(n1,true,alpha,beta,depth-1);
+                currentBest = minimax(n1,true,alpha,beta,depth-1);
                 if (currentBest.hValue < bestMove.hValue){
                     bestMove = currentBest;
                 }
                 if(){
                 return bestMove;
                 }
-            }
-        }
-    }
-    //Return the ultimate spot for the move which the gamer will use
-    public int minimax(int keyIndex, boolean isMax,int alpha,int beta,int depth){
-        //Level 0 (we are max and we want to pick maximum of the next x combinations)
-        HashMap allMoves = possibleMoves();
-        //evaluate()
-
-
-        //Grab all the values in the hashmap and return the highest
-
-
-        if(allMoves.isEmpty()){
-            return keyIndex;// return the key :")
-        }
-        //Check if node is the leaf -> return the value of the node
-        if (isMax){ // Our turn (?)
-            int maxVal = 0;
-
-            //Recurse for left and right children
-            for (int i = 0; i < 2; i++) {
-                int value = minimax(keyIndex*2 + i, false, alpha, beta, depth + 1);
-                maxVal = max(value,maxVal);
-                alpha = max(alpha,maxVal);
-
-                //Alpha - beta pruning
-                if (alpha >= beta){
-                    break;
+                if (bestMove.hValue < beta){
+                    return bestMove;
                 }
-
             }
-            return maxVal;
-        }else{
-
         }
-
+        return null;
     }
+
 
 }
