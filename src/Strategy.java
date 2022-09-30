@@ -125,6 +125,10 @@ public class Strategy {
         }
     }
 
+    public List<Node> getChildren (Node n){ return n.children; }
+
+    public int numChildren(Node n){ return n.children.size(); }
+
     public Node createNode(int board, int spot){
         return new Node(board, spot);
     }
@@ -135,6 +139,22 @@ public class Strategy {
 
     public int getBoard(Node n){
         return n.cBoard;
+    }
+
+    public int getHValue(Node n){ return n.hValue; }
+
+    public Node setChildren(Node n, int[] boards, int[] spots){
+        for (int i = 0; i < boards.length; i++){
+           n.children.add(createNode(boards[i],spots[i]));
+        }
+        return n;
+    }
+
+    public void printChildren(Node n){
+        for(int i = 0; i < n.children.size(); i++){
+            System.out.println("Child Number: " + i);
+            System.out.println("Board: " + getBoard(n.children.get(i)) + "; Spot " + getSpot(n.children.get(i)));
+        }
     }
 
     //Put all the legal moves (spots) in the list
@@ -152,47 +172,53 @@ public class Strategy {
         return pmoves;
     }
 
+    public int[] modifyBoard(int[] pBoard, int i, int player){
+        pBoard[i] = player;
+        return pBoard;
+    }
 
-    public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth) {
+    public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth, int[] pBoard) {
         Node currentBest;
         if (n == null){
             return null;
         }
-        if (n.children == null){
-            int[] ourBoard = gameBoard[currentBoard];
-            n.hValue = evaluate(1, ourBoard);
+        if (n.children.isEmpty() && isMax){
+            n.hValue = evaluate(1, pBoard);
+            return n;
+        }else if (n.children.isEmpty()){
+            n.hValue = evaluate(2, pBoard);
             return n;
         }
+
         if (isMax){
-            Node bestMove = new Node(currentBoard,INVALID_SPOT);
-            bestMove.hValue = MIN_VALUE;
-            for (Node n1 : n.children){
-                currentBest = minimax(n1,false,alpha,beta,depth-1);
-                if (currentBest.hValue > bestMove.hValue){
-                    bestMove = currentBest;
+            Node bestMove = new Node(currentBoard,INVALID_SPOT); //Setting dummy variable
+            bestMove.hValue = MIN_VALUE;                         //Setting dummy heuristic
+            for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
+                currentBest = minimax(n.children.get(i),false,alpha,beta,depth-1, modifyBoard(pBoard,i,1)); //Putting move on potential board and recursing
+                if (currentBest.hValue > bestMove.hValue){       //Comparing newly returned heuristic value to the previous heuristic value
+                    bestMove = currentBest;                      //Setting best move to current best if the heuristic is LARGER
+                    System.out.println(currentBest.spot);
+                    System.out.println(currentBest.hValue);
                 }
-                if (bestMove.hValue > alpha){
+                if (bestMove.hValue > alpha){                    //Alpha-beta pruning for Max case; limits program and saves time
                     return bestMove;
                 }
-
             }
+            return bestMove;                                     //Returns in case where Alpha beta pruning is not necessary
         }else{
             Node bestMove = new Node(currentBoard,INVALID_SPOT);
             bestMove.hValue = MAX_VALUE;
-            for (Node n1 : n.children){
-                currentBest = minimax(n1,true,alpha,beta,depth-1);
+            for (int i = 0; i < n.children.size(); i++){
+                currentBest = minimax(n.children.get(i),true,alpha,beta,depth-1, modifyBoard(pBoard,i,2));
                 if (currentBest.hValue < bestMove.hValue){
                     bestMove = currentBest;
-                }
-                if(){
-                return bestMove;
                 }
                 if (bestMove.hValue < beta){
                     return bestMove;
                 }
             }
+            return bestMove;
         }
-        return null;
     }
 
 
