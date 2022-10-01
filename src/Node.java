@@ -21,15 +21,19 @@ import java.util.List;
         }
 
 
-        public Node getRootNode(){
-            if(rootNode != null){
-                if(rootNode.rootNode != null){
-                    return rootNode.getRootNode();
+        public Node getRootNode(int player){
+            if(rootNode != null && player == 1 ){
+                if(rootNode.rootNode != null ){
+                    return rootNode.getRootNode(player);
+                }
+            } else if (rootNode != null && player == 2){
+                if(rootNode.rootNode.rootNode != null ){
+                    return rootNode.getRootNode(player);
                 }
             }
 
 
-            return this;
+                return this;
         }
 
         // what do we want to compare for a node
