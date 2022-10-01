@@ -13,8 +13,16 @@ public class Gamer {
 
     public Gamer(String ourName) {
         this.ourName = ourName;
-        gameBoard = new int[9][9];//Board-Spot?
-        boardWinState = new int[9];
+        this.gameBoard = new int[9][9];//Board-Spot?
+        this.boardWinState = new int[9];
+    }
+
+    public int[][] getGameBoard(){
+        return  gameBoard;
+    }
+
+    public  int[] getBoardWinState(){
+        return boardWinState;
     }
 
     /**
@@ -184,7 +192,7 @@ public class Gamer {
     public String displayBoard() {
         //Printing the original 9x9 board with annotation 1 as our move and 2 as our player's move
         updateBoard(); // Update the board before printing
-        
+
         String border = "---------------------\n";
         String row0 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][0],gameBoard[0][1],gameBoard[0][2],gameBoard[1][0],gameBoard[1][1],gameBoard[1][2],gameBoard[2][0],gameBoard[2][1],gameBoard[2][2]);
         String row1 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][3],gameBoard[0][4],gameBoard[0][5],gameBoard[1][3],gameBoard[1][4],gameBoard[1][5],gameBoard[2][3],gameBoard[2][4],gameBoard[2][5]);
