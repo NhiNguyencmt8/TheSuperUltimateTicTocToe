@@ -1,19 +1,18 @@
-import org.w3c.dom.NodeList;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+
 
 import static java.lang.Math.max;
 
 public class Strategy {
     private int[][] gameBoard;
     public int currentBoard;
+
     private int[] boardWinState;
     final int MIN_VALUE = -2147483647;
     final int MAX_VALUE = 2147483647;
     final int INVALID_SPOT = -1;
+    Node bestMove = new Node(1,currentBoard,INVALID_SPOT,new int[1]);
 
     public Strategy(int[][] gameBoard, int[] boardWinState) {
         this.gameBoard = gameBoard;
@@ -123,122 +122,91 @@ public class Strategy {
     // 2 in a row + empty boxes
     // 3 in a row (WIN)
 
-    private class Node implements Comparable<Node>{
-        private int hValue;
-        private int spot;
-        private int cBoard;
-        private List<Node> children;
-        public Node(int board, int spot) {
-            this.cBoard = board;
-            this.spot = spot;
-            children = new ArrayList<Node>();
-        }
-
-        // what do we want to compare for a node
-        @Override
-        public int compareTo(Node o) {
-            return 0;
-        }
-    }
-
-    public List<Node> getChildren (Node n){ return n.children; }
-
-    public int numChildren(Node n){ return n.children.size(); }
-
-    public Node createNode(int board, int spot){
-        return new Node(board, spot);
-    }
-
-    public int getSpot(Node n){
-        return n.spot;
-    }
-
-    public int getBoard(Node n){
-        return n.cBoard;
-    }
-
-    public int getHValue(Node n){ return n.hValue; }
-
-    public Node setChildren(Node n, int[] boards, int[] spots){
-        for (int i = 0; i < boards.length; i++){
-           n.children.add(createNode(boards[i],spots[i]));
-        }
-        return n;
-    }
-
-    public void printChildren(Node n){
-        for(int i = 0; i < n.children.size(); i++){
-            System.out.println("Child Number: " + i);
-            System.out.println("Board: " + getBoard(n.children.get(i)) + "; Spot " + getSpot(n.children.get(i)));
-        }
-    }
-
     //Put all the legal moves (spots) in the list
     //Search for all the empty cells on the board (not the big board) and put it on the list
-    private ArrayList<Node> possibleMoves(){
-        ArrayList<Node> pmoves = new ArrayList<>();
-        int[] cBoard = gameBoard[currentBoard];
-        for (int spot = 0; spot < cBoard.length; spot++){
-            if(cBoard[spot] == 0){
-                Node possibleNode = new Node(currentBoard,spot); //Review this after we call the function somewhere in the code
-                pmoves.add(possibleNode);
+    public ArrayList possibleMoves(){
+        ArrayList pMoves = new ArrayList<Integer>();
+
+        for (int spot = 0; spot < 9; spot++){
+            if(gameBoard[currentBoard][spot] == 0){
+                pMoves.add(spot);
             }
         }
 
-        return pmoves;
-    }
-
-    public int[] modifyBoard(int[] pBoard, int i, int player){
-        pBoard[i] = player;
-        return pBoard;
+        return pMoves;
     }
 
 
-    public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth, int[] pBoard) {
-        Node currentBest;
+
+    public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth) {
+        Node current;
+        System.out.println("Best move spot is " + bestMove.spot);
+        if(depth == 0){
+            if(isMax ){
+                bestMove.hValue = MIN_VALUE;
+            } else{
+                bestMove.hValue = MAX_VALUE;
+                bestMove.player = 2;
+            }
+        }
+
+
+
         if (n == null){
             return null;
         }
-        if (n.children.isEmpty() && isMax){
+        if (n.children.isEmpty()){
             System.out.println("Our turn terminal");
-            n.hValue = evaluate(1,pBoard);
-            return n;
-        }else if (n.children.isEmpty()){
-            n.hValue = evaluate(1,pBoard);
+            n.hValue = evaluate(1,n.boardConfig);
+            System.out.println(n.hValue);
             return n;
         }
 
         if (isMax){
-            Node bestMove = new Node(currentBoard,INVALID_SPOT); //Setting dummy variable
-            bestMove.hValue = MIN_VALUE;                         //Setting dummy heuristic
+                        //Setting dummy heuristic
             for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
-                System.out.println("Child Spot: " + getSpot(n.children.get(i)));
-                currentBest = minimax(n.children.get(i),false,alpha,beta,depth-1,pBoard); //Putting move on potential board and recursing
-                System.out.println("Current Best Spot: " + currentBest.spot);
-                System.out.println("Current Best HVal: " + currentBest.hValue);
-                if (currentBest.hValue > bestMove.hValue){       //Comparing newly returned heuristic value to the previous heuristic value
-                    bestMove = currentBest;                      //Setting best move to current best if the heuristic is LARGER
+                System.out.println("Child Spot: " + n.children.get(i).spot);
+                current = minimax(n.children.get(i),false,alpha,beta,depth-1); //Putting move on potential board and recursing
+                System.out.println("Current Spot: " + current.spot);
+                System.out.println("Current HVal: " + current.hValue);
+
+                if (current.hValue >= 500){                    //Alpha-beta pruning for Max case; limits program and saves time
+                    return current;
+                }
+
+                if (current.hValue > bestMove.hValue){       //Comparing newly returned heuristic value to the previous heuristic value
+                    bestMove = current;                      //Setting best move to current best if the heuristic is LARGER
+                    alpha = bestMove.hValue;
                     System.out.println();
                 }
-                //if (bestMove.hValue > alpha){                    //Alpha-beta pruning for Max case; limits program and saves time
-                  //  return bestMove;
-                //}
+
+                if (current.hValue > alpha){                    //Alpha-beta pruning for Max case; limits program and saves time
+                    return bestMove;
+                }
             }
             return bestMove;                                     //Returns in case where Alpha beta pruning is not necessary
         }else{
-            Node bestMove = new Node(currentBoard,INVALID_SPOT);
-            bestMove.hValue = MAX_VALUE;
+
             for (int i = 0; i < n.children.size(); i++){
-                System.out.println("Child Spot: " + getSpot(n.children.get(i)));
-                currentBest = minimax(n.children.get(i),true,alpha,beta,depth-1, pBoard);
-                System.out.println("Current Best Spot: " + currentBest.spot);
-                System.out.println("Current Best HVal: " + currentBest.hValue);
-                if (currentBest.hValue < bestMove.hValue){
-                    bestMove = currentBest;
+                System.out.println("Child Spot: " + n.children.get(i).spot);
+                current = minimax(n.children.get(i),true,alpha,beta,depth-1);
+                System.out.println("Current Spot: " + current.spot);
+                System.out.println("Current HVal: " + current.hValue);
+                /*
+                @TODO: call utility function
+                 */
+                if (current.hValue >= 500 ){                    //Alpha-beta pruning for Max case; limits program and saves time
+                    return current;
                 }
-               // if (bestMove.hValue < beta){
-                 //   return bestMove;
-                //}
+
+                if (current.hValue < bestMove.hValue){
+                    bestMove = current;
+                    beta = bestMove.hValue;
+                }
+
+                if (current.hValue < beta){
+                    return bestMove;
+                }
             }
             return bestMove;
         }
@@ -248,32 +216,29 @@ public class Strategy {
         System.out.println(Arrays.toString(board));
     }
 
-    public Node findBestMove(int[] currentBoard, int player){
-
-        int bestVal = -100000;
-        Node bestMove = new Node(this.currentBoard,-1);
-        bestMove.spot = -1;
-
-        for (int i = 0; i < 9; i++){
-            int spot = i;
-            if (currentBoard[spot] == 0){
-                //make the move
-                currentBoard[spot] = player;
-
-                //Just put this as depth = 3 I guess
-                Node moveNode = minimax(bestMove,false,0,0,8,currentBoard);
-                //undo the move
-                currentBoard[spot] = 0;
-                if (moveNode.hValue > bestVal) {
-                    bestMove = moveNode;
-                    bestVal = moveNode.hValue;
-                }
-
-            }
-        }
-        return  bestMove;
-
-    }
+//    public Node findBestMove(int[] currentBoard, int player){
+//
+//        int bestVal = -100000;
+//        Node bestMove = new Node(player, this.currentBoard,-1, currentBoard);
+//        bestMove.spot = -1;
+//
+//        for (int i = 0; i < 9; i++){
+//            int spot = i;
+//            if (currentBoard[spot] == 0){
+//
+//                //Just put this as depth = 3 I guess
+//                Node moveNode = minimax(bestMove,false,0,0,8);
+//
+//                if (moveNode.hValue > bestVal) {
+//                    bestMove = moveNode;
+//                    bestVal = moveNode.hValue;
+//                }
+//
+//            }
+//        }
+//        return  bestMove;
+//
+//    }
 
 
 }

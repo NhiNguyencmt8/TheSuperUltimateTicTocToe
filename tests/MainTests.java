@@ -16,7 +16,7 @@ public class MainTests {
             //If the board at the opponent's move spot is win or not
             if(play.getBoardWinState()[previousMove[1]] == 1){
                 //
-                strategy.findBestMove(play.getBoardWinState(),player);
+                //strategy.findBestMove(play.getBoardWinState(),player);
             }
 
         }
