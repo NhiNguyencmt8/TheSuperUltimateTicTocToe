@@ -159,11 +159,7 @@ public class Strategy {
             }
 
             if (isMax){
-                //add children line (+1 depth)
-                //check for vacant spots
-                //put these spots on the tree
                 addNewLevel(n,1);
-
                     for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
                         System.out.println("Child Spot: " + n.children.get(i).spot);
                         current = minimax(n.children.get(i),false,alpha,beta,depth-1); //Putting move on potential board and recursing
@@ -178,8 +174,7 @@ public class Strategy {
 
                     }
 
-
-                return bestMove;                                     //Returns in case where Alpha beta pruning is not necessary
+                return bestMove.getRoot(bestMove);                                     //Returns in case where Alpha beta pruning is not necessary
             }else{
 
 
@@ -201,7 +196,7 @@ public class Strategy {
                         }
 
                     }
-                return bestMove;
+                return bestMove.getRoot(bestMove);
                 }
 
 

@@ -16,7 +16,7 @@ import java.util.List;
             this.spot = spot;
             children = new ArrayList<Node>();
             this.boardConfig = boardConfig;
-            this.rootNode = null;
+            this.rootNode = this;
 
         }
 
@@ -50,7 +50,15 @@ import java.util.List;
             newConfig[spot] = player;
             Node c1 = new Node(player, n.cBoard, spot, newConfig);
             n.children.add(c1);
-            c1.rootNode = n;
+            if (n.player == 1 || n.player == 2){
+                c1.rootNode = n.rootNode;
+            }else{
+                c1.rootNode = c1;
+            }
+        }
+
+        public Node getRoot(Node n){
+            return n.rootNode;
         }
 
         public int[] modifyBoard(int[] pBoard, int i, int player){

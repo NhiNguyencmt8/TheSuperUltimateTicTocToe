@@ -124,7 +124,12 @@ public class StrategyTests {
         Strategy strat = new Strategy(gameBoard, new int[9]);
 
 
-        Node n = new Node(2,0,7, ourBoard);
+        Node n = new Node(0,0,7, ourBoard);
+        for (int i = 0; i < ourBoard.length; i++){
+            System.out.print(ourBoard[i]);
+        }
+
+
 
 
 //        n.addChild(n, 2,1);
@@ -159,7 +164,7 @@ public class StrategyTests {
 
 
 
-        System.out.println("Final" + strat.doMinimax(n,true,1000000000,-1000000000,1).spot);
+        System.out.println("Final" + strat.doMinimax(n,true,1000000000,-1000000000,3).spot);
 
 
         //strat.printChildren(strat.setChildren(strat.createNode(0,7), boards,spots));
