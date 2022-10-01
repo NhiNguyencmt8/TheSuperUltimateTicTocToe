@@ -1,6 +1,7 @@
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class Strategy {
         this.boardWinState = boardWinState;
 
     }
+
+//public
 
     /**
      * Determines whether a board is won in ourPlayer's favor
@@ -50,27 +53,25 @@ public class Strategy {
 
         int heuristic = 0;
         //all rows
-        for(int i = 0; i < 8; i+=3) {
+        for(int i = 0; i <= 6; i+=3) {
             int ourp = 0, otherp = 0;
             //checks each spot in a row
             for(int j = i; j < i+3; j++) {
                 if(board[j] == player) { ourp++; }
                 else if(board[j] == otherPlayer) { otherp++; }
             }
-            if(ourp > otherp) { heuristic += 5; }
-            else if(otherp > ourp) { heuristic -= 5; }
+            heuristic = getHeuristic(heuristic, ourp, otherp);
         }
 
         //all columns
         for(int i = 0; i < 3; i++) {
             int ourp = 0; int otherp = 0;
             //checks each spot in a column
-            for(int j = i; j < 8; j+=3) {
+            for(int j = i; j <= 8; j+=3) {
                 if(board[j] == player) { ourp++; }
                 else if(board[j] == otherPlayer) { otherp++; }
             }
-            if(ourp > otherp) { heuristic += 5; }
-            else if(otherp > ourp) { heuristic -= 5; }
+            heuristic = getHeuristic(heuristic, ourp, otherp);
         }
 
         //diagonal 1
@@ -79,8 +80,7 @@ public class Strategy {
             if(board[i] == player) { ourp++; }
             else if(board[i] == otherPlayer) { otherp++; }
         }
-        if(ourp > otherp) { heuristic += 5; }
-        else if(otherp > ourp) { heuristic -= 5; }
+        heuristic = getHeuristic(heuristic, ourp, otherp);
 
         //diagonal 2
         ourp = 0; otherp = 0;
@@ -88,8 +88,24 @@ public class Strategy {
             if(board[i] == player) { ourp++; }
             else if(board[i] == otherPlayer) { otherp++; }
         }
-        if(ourp > otherp) { heuristic += 5; }
-        else if(otherp > ourp) { heuristic -= 5; }
+        heuristic = getHeuristic(heuristic, ourp, otherp);
+
+        return heuristic;
+    }
+
+    private int getHeuristic(int heuristic, int ourp, int otherp) {
+        if(ourp + otherp == 3 && ourp > 0 && otherp > 0) {
+            return heuristic;
+        } else if(ourp == 3) {
+            return 500;
+        } else if(otherp == 3) {
+            return -500;
+        }
+
+        if(ourp - otherp == 2) { heuristic += 50; }
+        else if(otherp - ourp == 2) { heuristic -= 50; }
+        else if(ourp - otherp == 1) { heuristic += 5; }
+        else if(otherp - ourp == 1) { heuristic -= 5; }
 
         return heuristic;
     }
@@ -177,16 +193,18 @@ public class Strategy {
         return pBoard;
     }
 
+
     public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth, int[] pBoard) {
         Node currentBest;
         if (n == null){
             return null;
         }
         if (n.children.isEmpty() && isMax){
-            n.hValue = evaluate(1, pBoard);
+            System.out.println("Our turn terminal");
+            n.hValue = evaluate(1,pBoard);
             return n;
         }else if (n.children.isEmpty()){
-            n.hValue = evaluate(2, pBoard);
+            n.hValue = evaluate(1,pBoard);
             return n;
         }
 
@@ -194,31 +212,67 @@ public class Strategy {
             Node bestMove = new Node(currentBoard,INVALID_SPOT); //Setting dummy variable
             bestMove.hValue = MIN_VALUE;                         //Setting dummy heuristic
             for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
-                currentBest = minimax(n.children.get(i),false,alpha,beta,depth-1, modifyBoard(pBoard,i,1)); //Putting move on potential board and recursing
+                System.out.println("Child Spot: " + getSpot(n.children.get(i)));
+                currentBest = minimax(n.children.get(i),false,alpha,beta,depth-1,pBoard); //Putting move on potential board and recursing
+                System.out.println("Current Best Spot: " + currentBest.spot);
+                System.out.println("Current Best HVal: " + currentBest.hValue);
                 if (currentBest.hValue > bestMove.hValue){       //Comparing newly returned heuristic value to the previous heuristic value
                     bestMove = currentBest;                      //Setting best move to current best if the heuristic is LARGER
-                    System.out.println(currentBest.spot);
-                    System.out.println(currentBest.hValue);
+                    System.out.println();
                 }
-                if (bestMove.hValue > alpha){                    //Alpha-beta pruning for Max case; limits program and saves time
-                    return bestMove;
-                }
+                //if (bestMove.hValue > alpha){                    //Alpha-beta pruning for Max case; limits program and saves time
+                  //  return bestMove;
+                //}
             }
             return bestMove;                                     //Returns in case where Alpha beta pruning is not necessary
         }else{
             Node bestMove = new Node(currentBoard,INVALID_SPOT);
             bestMove.hValue = MAX_VALUE;
             for (int i = 0; i < n.children.size(); i++){
-                currentBest = minimax(n.children.get(i),true,alpha,beta,depth-1, modifyBoard(pBoard,i,2));
+                System.out.println("Child Spot: " + getSpot(n.children.get(i)));
+                currentBest = minimax(n.children.get(i),true,alpha,beta,depth-1, pBoard);
+                System.out.println("Current Best Spot: " + currentBest.spot);
+                System.out.println("Current Best HVal: " + currentBest.hValue);
                 if (currentBest.hValue < bestMove.hValue){
                     bestMove = currentBest;
                 }
-                if (bestMove.hValue < beta){
-                    return bestMove;
-                }
+               // if (bestMove.hValue < beta){
+                 //   return bestMove;
+                //}
             }
             return bestMove;
         }
+    }
+
+    public void printIndBoard(int[] board) {
+        System.out.println(Arrays.toString(board));
+    }
+
+    public Node findBestMove(int[] currentBoard, int player){
+
+        int bestVal = -100000;
+        Node bestMove = new Node(this.currentBoard,-1);
+        bestMove.spot = -1;
+
+        for (int i = 0; i < 9; i++){
+            int spot = i;
+            if (currentBoard[spot] == 0){
+                //make the move
+                currentBoard[spot] = player;
+
+                //Just put this as depth = 3 I guess
+                Node moveNode = minimax(bestMove,false,0,0,8,currentBoard);
+                //undo the move
+                currentBoard[spot] = 0;
+                if (moveNode.hValue > bestVal) {
+                    bestMove = moveNode;
+                    bestVal = moveNode.hValue;
+                }
+
+            }
+        }
+        return  bestMove;
+
     }
 
 
