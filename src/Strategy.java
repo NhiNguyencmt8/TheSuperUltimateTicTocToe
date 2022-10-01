@@ -136,16 +136,15 @@ public class Strategy {
     }
 
     public Node doMinimax(Node n, boolean isMax, int alpha, int beta, int depth) {
-        if(isMax) {
-            bestMove.hValue = MAX_VALUE;
-        } else {
+        if(isMax && depth%2 != 0) {
             bestMove.hValue = MIN_VALUE;
+        } else {
+            bestMove.hValue = MAX_VALUE;
         }
         return minimax(n, isMax, alpha, beta, depth);
     }
 
     public Node minimax(Node n, boolean isMax, int alpha, int beta, int depth) {
-
         Node current;
 //        System.out.println("Best move spot is " + bestMove.spot);
 
@@ -174,13 +173,11 @@ public class Strategy {
             //check for vacant spots
             //put these spots on the tree
             addNewLevel(n,1);
-
+            //if (bestMove.hValue >= 500 && bestMove.hValue < MAX_VALUE){
+              //  return bestMove;
+            //}
             for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
                 System.out.println("Child Spot: " + n.children.get(i).spot);
-
-                if(bestMove.hValue >= 500 && bestMove.hValue < MAX_VALUE) {
-                    return bestMove;
-                }
                 current = minimax(n.children.get(i),false,alpha,beta,depth-1); //Putting move on potential board and recursing
 
 //                printIndBoard(current.boardConfig);
