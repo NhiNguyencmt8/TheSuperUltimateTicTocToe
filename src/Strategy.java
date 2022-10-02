@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-
-
 import static java.lang.Math.max;
 
 public class Strategy {
@@ -12,8 +8,9 @@ public class Strategy {
     final int MIN_VALUE = -2147483647;
     final int MAX_VALUE = 2147483647;
     final int INVALID_SPOT = -1;
+    int bestHVal,bestSpot = -1;
     Node bestMove = new Node(1,currentBoard,INVALID_SPOT,new int[1]);
-
+    int initDepth= 0;
     public Strategy(int[][] gameBoard, int[] boardWinState) {
         this.gameBoard = gameBoard;
         this.boardWinState = boardWinState;
@@ -106,7 +103,7 @@ public class Strategy {
         if(ourp - otherp == 2) { heuristic += 50; }
         else if(otherp - ourp == 2) { heuristic -= 50; }
         else if(ourp - otherp == 1) { heuristic += 5; }
-        else if(otherp - ourp == 1) { heuristic += 300; } // theirs is 2 - us is 1 -> we block them //-=5 before
+        else if(otherp - ourp == 1) { heuristic -= 5; } // theirs is 2 - us is 1 -> we block them //-=5 before
 
         return heuristic;
     }
@@ -126,7 +123,7 @@ public class Strategy {
 
     //Put all the legal moves (spots) in the list
     //Search for all the empty cells on the board (not the big board) and put it on the list
-    public Node addNewLevel(Node n,int player){
+    public Node addNewLevels(Node n, int player){
         for (int spot = 0; spot < 9; spot++){
             if(n.boardConfig[spot] == 0){
                 n.addChild(n,spot,player);
@@ -136,6 +133,7 @@ public class Strategy {
     }
 
     public Node doMinimax(Node n, boolean isMax, int alpha, int beta, int depth) {
+        initDepth = depth;
         if(isMax && depth%2 != 0) {
             bestMove.hValue = MIN_VALUE;
         } else {
@@ -152,19 +150,27 @@ public class Strategy {
         }
 
 
-            if (depth == 0){
+            if (depth == 0 ){
                 n.hValue = evaluate(1, n.boardConfig);
                 printIndBoard(n.boardConfig);
+                System.out.println("hvalue" + bestMove.hValue);
                 return n;
             }
 
             if (isMax){
-                addNewLevel(n,1);
+                addNewLevels(n,1);
                     for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
-                        System.out.println("Child Spot: " + n.children.get(i).spot);
+
+                        int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
+                        System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
+                        if ( iterativeEval >= 450 && n.spot != -1){
+                            bestMove.spot = n.children.get(i).spot;
+                            bestMove.hValue = iterativeEval;
+                            return bestMove;
+                        }
                         current = minimax(n.children.get(i),false,alpha,beta,depth-1); //Putting move on potential board and recursing
 
-                        System.out.println(bestMove.hValue);
+
                         if (current.hValue > bestMove.hValue){       //Comparing newly returned heuristic value to the previous heuristic value
                             bestMove = current;                      //Setting best move to current best if the heuristic is LARGER
                             alpha = bestMove.hValue;
@@ -174,20 +180,22 @@ public class Strategy {
 
                     }
 
-                return bestMove.getRoot(bestMove);                                     //Returns in case where Alpha beta pruning is not necessary
+                if(initDepth != 1 && initDepth%2 == 1){
+                    //return bestMove.getRoot(bestMove);
+                }
+                                                   //Returns in case where Alpha beta pruning is not necessary
             }else{
 
 
                 //add children line (+1 depth)
                 //check for vacant spots
                 //put these spots on the tree
-                addNewLevel(n,2);
+                addNewLevels(n,2);
 
                     for (int i = 0; i < n.children.size(); i++){
                         int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
-                        if ( iterativeEval<= -500 && n.spot != -1){
-                            return bestMove;
-                        }
+                        System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
+
                         current = minimax(n.children.get(i),true,alpha,beta,depth-1);
 
                         if (current.hValue < bestMove.hValue){
@@ -196,9 +204,13 @@ public class Strategy {
                         }
 
                     }
-                return bestMove.getRoot(bestMove);
-                }
+                    if(initDepth != 1 && initDepth%2 == 1){
+                        //return bestMove.getRoot(bestMove);
+                    }
 
+
+                }
+            return bestMove;
 
             }
 
@@ -210,29 +222,72 @@ public class Strategy {
         System.out.printf("%d %d %d\n%d %d %d\n%d %d %d\n", board[0],board[1],board[2],board[3],board[4],board[5],board[6],board[7],board[8]);
     }
 
-//    public Node findBestMove(int[] currentBoard, int player){
-//
-//        int bestVal = -100000;
-//        Node bestMove = new Node(player, this.currentBoard,-1, currentBoard);
-//        bestMove.spot = -1;
-//
-//        for (int i = 0; i < 9; i++){
-//            int spot = i;
-//            if (currentBoard[spot] == 0){
-//
-//                //Just put this as depth = 3 I guess
-//                Node moveNode = minimax(bestMove,false,0,0,8);
-//
-//                if (moveNode.hValue > bestVal) {
-//                    bestMove = moveNode;
-//                    bestVal = moveNode.hValue;
-//                }
-//
-//            }
-//        }
-//        return  bestMove;
-//
-//    }
 
+    public int[] minimax2(Node n, boolean isMax, int alpha, int beta, int depth) {
+
+         bestHVal = isMax ? MIN_VALUE : MAX_VALUE;
+
+
+
+        if (depth == 0 ){
+            bestHVal = evaluate(1, n.boardConfig);
+            printIndBoard(n.boardConfig);
+            System.out.println("hvalue" + bestHVal);
+
+        } else {
+            if (isMax){
+                addNewLevels(n,1);
+                for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
+
+                    int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
+                    System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
+                    if ( utility(1, n.children.get(i).boardConfig) == 1){ //iterativeEval >= 450 && n.spot != -1
+                        bestSpot = n.children.get(i).spot;
+                        bestHVal = iterativeEval + depth*100;
+                        int[] bestMove = {bestSpot,bestHVal};
+                        return bestMove;
+                    }
+                    int[] current = minimax2(n.children.get(i),false,alpha,beta,depth-1); //Putting move on potential board and recursing
+
+                    if (current[1] > alpha){       //Comparing newly returned heuristic value to the previous heuristic value
+                        bestSpot = n.children.get(i).spot;                      //Setting best move to current best if the heuristic is LARGER
+                        bestHVal = current[1];
+                        alpha = bestHVal;
+                        System.out.println();
+                    }
+                    if (alpha >= beta) break;
+                }
+                //Returns in case where Alpha beta pruning is not necessary
+            }else{
+                //add children line (+1 depth)
+                //check for vacant spots
+                //put these spots on the tree
+                addNewLevels(n,2);
+
+                for (int i = 0; i < n.children.size(); i++){
+                    int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
+                    System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
+                    if ( utility(1, n.children.get(i).boardConfig) == -1){ //iterativeEval >= 450 && n.spot != -1
+                        bestSpot = n.children.get(i).spot;
+                        bestHVal = iterativeEval - depth*100;
+                        int[] bestMove = {bestSpot,bestHVal};
+                        return bestMove;
+                    }
+                    int[] current = minimax2(n.children.get(i),true,alpha,beta,depth-1);
+
+                    if (current[1] < beta){
+                        bestSpot = n.children.get(i).spot;                      //Setting best move to current best if the heuristic is LARGER
+                        bestHVal = current[1];
+                        beta = bestHVal;
+                    }
+                    if (alpha >= beta) break;
+                }
+            }
+        }
+
+
+        int[] bestMove = {bestSpot,bestHVal};
+        return bestMove;
+    }
 
 }

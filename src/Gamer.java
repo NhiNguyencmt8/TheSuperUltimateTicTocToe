@@ -10,6 +10,7 @@ public class Gamer {
     private String ourName;
     private int[][] gameBoard;
     private int[] boardWinState; //1x9 matrix that indicates the win state of the big board
+    public Stopwatch recMove;
 
     public Gamer(String ourName) {
         this.ourName = ourName;
@@ -87,8 +88,8 @@ public class Gamer {
     public int isBoardWon(int[] board) {
         //Check all row won
         // {0,1,2}, {3,4,5}, {6,7,8}
-        for(int i = 0; i < 8; i++) {
-            if(board[i] == board[++i] && board[i] == board[++i]){
+        for(int i = 0; i < 8; i+=3) {
+            if(board[i] == board[i+1] && board[i] == board[i+2]){
                 return board[i];
             }
         }
@@ -133,6 +134,7 @@ public class Gamer {
         try {
             while (!movefile.exists() || !playerfile.exists()) {
             }
+            recMove = new Stopwatch(); // 10 sec timer starts
 
             Scanner move = new Scanner(movefile);
             if (move.hasNextLine()) {
@@ -226,5 +228,14 @@ public class Gamer {
         }
     }
 
+    public int countRemainingMoves(int[] board) {
+        int count = 0;
+        for(int i = 0; i < 9; i++) {
+            if(board[i] == 0) {
+                count++;
+            }
+        }
+        return count;
+    }
 
 }

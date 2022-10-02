@@ -28,7 +28,7 @@ import java.util.List;
                 }
             } else if (rootNode != null && player == 2){
                 if(rootNode.rootNode.rootNode != null ){
-                    return rootNode.getRootNode(player);
+                    return rootNode.rootNode.getRootNode(player);
                 }
             }
 
