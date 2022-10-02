@@ -5,17 +5,20 @@ import java.util.Scanner;
 
 public class Gamer {
     private final File movefile = new File("ref\\move_file");
-    private final File playerfile = new File("ref\\walrus.go");
+    private final File playerfile = new File("ref\\Walrus.go");
+    private final File first_four_moves = new File("ref\\first_four_moves");
 
     private String ourName;
     private int[][] gameBoard;
     private int[] boardWinState; //1x9 matrix that indicates the win state of the big board
     public Stopwatch recMove;
+    private int[] finalFirstMove;
 
     public Gamer(String ourName) {
         this.ourName = ourName;
         this.gameBoard = new int[9][9];//Board-Spot?
         this.boardWinState = new int[9];
+        this.finalFirstMove = new int[2];
     }
 
     public int[][] getGameBoard(){
@@ -38,10 +41,10 @@ public class Gamer {
      * Updates the board based on the most recent move received
      * @return true if board successfully updated
      */
-    public boolean updateBoard() {
+    public int[] updateBoard() {
         int[] move = getMove();
         if(move == null) {
-            return false;
+            return finalFirstMove;
         }
         int player = move[0];
         int board = move[1];
@@ -50,7 +53,7 @@ public class Gamer {
         //Update the move on our board
         gameBoard[board][spot] = player;
         displayBoard();
-        return true;
+        return new int[]{move[1], move[2]};
     }
 
     /**
@@ -69,13 +72,13 @@ public class Gamer {
      * @return true if the move can be made on the game board
      */
     public boolean legalMove(int board, int spot) {
-        //First check if the move is empty
+        //First check if the board not won already
         if (isBoardWon(gameBoard[board]) == 0) {
-            if (gameBoard[board][spot] == 0 && board == getMove()[2]) {
+            if (getMove() == null && board == finalFirstMove[1]) {
+                return true;
+            } else if(gameBoard[board][spot] == 0 && board == getMove()[2]) {
                 return true;
             }
-        } else if (gameBoard[board][spot] == 0) {
-                return true;
         }
         return false;
     }
@@ -125,6 +128,24 @@ public class Gamer {
         return isBoardWon(boardWinState);
     }
 
+    public void addFirstMoves(){
+        try  {
+            while (!first_four_moves.exists()){
+            }
+            Scanner move = new Scanner(first_four_moves);
+            String[] moves = new String[4];
+            for (int i = 0; i < moves.length; i++){
+                String[] arr = move.nextLine().split(" ");
+                gameBoard[Integer.parseInt(arr[1])][Integer.parseInt(arr[2])] = arr[0].equals(ourName) ? 1 : 2;
+                if (i == 3){
+                    finalFirstMove[0] = Integer.parseInt(arr[1]);
+                    finalFirstMove[1] = Integer.parseInt(arr[2]);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + first_four_moves + "not found");
+        }
+    }
     /**
      * Retrieves the opponent's move from movefile
      * @return an array of format {player_number, board, spot}
@@ -165,8 +186,8 @@ public class Gamer {
         while(!legalMove(board,spot)){
             board = randMove();
             spot = randMove();
-            System.out.println("No possible move, retrying");
-            System.out.println("New Board: " + board + " New Spot: " + spot);
+//            System.out.println("No possible move, retrying");
+//            System.out.println("New Board: " + board + " New Spot: " + spot);
         }
         if (legalMove(board, spot)) {
             aMove = String.format("%s %s %s", playerName, board, spot);
@@ -178,7 +199,11 @@ public class Gamer {
             } catch (FileNotFoundException e) {
                 return "Move not sent";
             }
-
+            if (playerName.equals(ourName)) {
+                gameBoard[board][spot] = 1;
+            } else {
+                gameBoard[board][spot] = 2;
+            }
         } else {
 
             System.out.println("No possible move");
@@ -187,13 +212,12 @@ public class Gamer {
     }
 
     /**
-     * Can be used to display the current state of gameBoard
-     * @return string representation of gameBoard
+     * Prints the current state of gameBoard
      * TODO also print what boards have been won and who won them
      */
-    public String displayBoard() {
+    public void displayBoard() {
         //Printing the original 9x9 board with annotation 1 as our move and 2 as our player's move
-        updateBoard(); // Update the board before printing
+        //updateBoard(); // Update the board before printing
 
         String border = "---------------------\n";
         String row0 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][0],gameBoard[0][1],gameBoard[0][2],gameBoard[1][0],gameBoard[1][1],gameBoard[1][2],gameBoard[2][0],gameBoard[2][1],gameBoard[2][2]);
@@ -206,9 +230,9 @@ public class Gamer {
         String row7 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][3],gameBoard[6][4],gameBoard[6][5],gameBoard[7][3],gameBoard[7][4],gameBoard[7][5],gameBoard[8][3],gameBoard[8][4],gameBoard[8][5]);
         String row8 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][6],gameBoard[6][7],gameBoard[6][8],gameBoard[7][6],gameBoard[7][7],gameBoard[7][8],gameBoard[8][6],gameBoard[8][7],gameBoard[8][8]);
 
-        return row0 + row1 + row2 + border +
+        System.out.println(row0 + row1 + row2 + border +
                 row3 + row4 + row5 + border +
-                row6 + row7 + row8;
+                row6 + row7 + row8);
     }
 
     /**
@@ -218,13 +242,10 @@ public class Gamer {
      */
     public void ourMove(int board, int spot) {
         if (isGameWon() == 0){
-            //Put the enemy move on our updated board
-            updateBoard();
-
             //Put our move on our updated board (if legal)
             sendMove(ourName, board, spot);
             //Update our move on the board
-            updateBoard();
+//            updateBoard();
         }
     }
 

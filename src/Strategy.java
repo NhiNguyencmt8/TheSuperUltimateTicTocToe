@@ -152,7 +152,7 @@ public class Strategy {
 
             if (depth == 0 ){
                 n.hValue = evaluate(1, n.boardConfig);
-                printIndBoard(n.boardConfig);
+//                printIndBoard(n.boardConfig);
                 System.out.println("hvalue" + bestMove.hValue);
                 return n;
             }
@@ -162,7 +162,7 @@ public class Strategy {
                     for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
 
                         int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
-                        System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
+                        //System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
                         if ( iterativeEval >= 450 && n.spot != -1){
                             bestMove.spot = n.children.get(i).spot;
                             bestMove.hValue = iterativeEval;
@@ -194,7 +194,7 @@ public class Strategy {
 
                     for (int i = 0; i < n.children.size(); i++){
                         int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
-                        System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
+                        //System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
 
                         current = minimax(n.children.get(i),true,alpha,beta,depth-1);
 
@@ -227,12 +227,10 @@ public class Strategy {
 
          bestHVal = isMax ? MIN_VALUE : MAX_VALUE;
 
-
-
-        if (depth == 0 ){
+        if (depth == 0){
             bestHVal = evaluate(1, n.boardConfig);
-            printIndBoard(n.boardConfig);
-            System.out.println("hvalue" + bestHVal);
+            //printIndBoard(n.boardConfig);
+            //System.out.println("hvalue" + bestHVal);
 
         } else {
             if (isMax){
@@ -240,8 +238,8 @@ public class Strategy {
                 for (int i = 0; i < n.children.size(); i++){         //Traversing list to deal with all children
 
                     int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
-                    System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
-                    if ( utility(1, n.children.get(i).boardConfig) == 1){ //iterativeEval >= 450 && n.spot != -1
+                    //System.out.println("Child Spot (max): " + n.children.get(i).spot + "at depth" + depth);
+                    if (utility(1, n.children.get(i).boardConfig) == 1){ //iterativeEval >= 450 && n.spot != -1
                         bestSpot = n.children.get(i).spot;
                         bestHVal = iterativeEval + depth*100;
                         int[] bestMove = {bestSpot,bestHVal};
@@ -253,7 +251,7 @@ public class Strategy {
                         bestSpot = n.children.get(i).spot;                      //Setting best move to current best if the heuristic is LARGER
                         bestHVal = current[1];
                         alpha = bestHVal;
-                        System.out.println();
+                        //System.out.println();
                     }
                     if (alpha >= beta) break;
                 }
@@ -266,8 +264,8 @@ public class Strategy {
 
                 for (int i = 0; i < n.children.size(); i++){
                     int iterativeEval = evaluate(1,n.children.get(i).boardConfig);
-                    System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
-                    if ( utility(1, n.children.get(i).boardConfig) == -1){ //iterativeEval >= 450 && n.spot != -1
+                    //System.out.println("Child Spot (min): " + n.children.get(i).spot + "at depth" + depth);
+                    if (utility(1, n.children.get(i).boardConfig) == -1){ //iterativeEval >= 450 && n.spot != -1
                         bestSpot = n.children.get(i).spot;
                         bestHVal = iterativeEval - depth*100;
                         int[] bestMove = {bestSpot,bestHVal};
