@@ -267,4 +267,12 @@ public class Gamer {
         return count;
     }
 
+    public boolean bigBoardIsFull(){
+        updateBoardWinState();
+        if (countRemainingMoves(boardWinState) == 0){
+            return true;
+        }
+        return false;
+    }
+
 }

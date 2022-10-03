@@ -9,7 +9,7 @@ public class Main {
         play.addFirstMoves();
         //double timeAtSend = play.recMove.elapsedTime();
         while (true) {
-            if (play.isGameWon() > 0){
+            if (play.isGameWon() > 0 || play.bigBoardIsFull()){
                 break;
             }
             //Wait for file to write
@@ -23,7 +23,8 @@ public class Main {
 
             System.out.println("win state " + play.isBoardWon(play.getGameBoard()[move[1]]));
             //If the board at the opponent's spot is won
-            if (play.isBoardWon(play.getGameBoard()[move[1]]) > 0) {
+            if (play.isBoardWon(play.getGameBoard()[move[1]]) > 0 ||
+                    play.countRemainingMoves(play.getGameBoard()[move[1]]) == 0) { // Board is won or full
                 // Pick another board
                 play.updateBoardWinState();
                 Node rootNodeBoard = new Node(2,0,0,play.getBoardWinState());
