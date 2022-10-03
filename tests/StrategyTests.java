@@ -107,14 +107,18 @@ public class StrategyTests {
     @Test
     public void testMax(){
         int[][] gameBoard = new int[9][9];
+        gameBoard[0][0] = 1;
         gameBoard[0][1] = 0;
         gameBoard[0][2] = 0;
-        gameBoard[0][8] = 0;
-        gameBoard[0][7] = 1;
+        gameBoard[0][4] = 2;
+        gameBoard[0][8] = 2;
+
+//        gameBoard[0][8] = 0;
+//        gameBoard[0][7] = 1;
         //board 0
-        // 0 1 0
+        // 2 1 0
         // 0 0 0
-        // 0 2 0
+        // 0 0 0
 
 
 
@@ -124,7 +128,7 @@ public class StrategyTests {
         Strategy strat = new Strategy(gameBoard, new int[9]);
 
 
-        Node n = new Node(2,0,7, ourBoard);
+        Node n = new Node(2,0,0, ourBoard);
         strat.printIndBoard(gameBoard[0]);
 
 
@@ -161,7 +165,7 @@ public class StrategyTests {
 
 
         //System.out.println("Final" + strat.doMinimax(n,true,1000000000,-1000000000,3).spot);
-        System.out.println("Final" + strat.minimax2(n,true,-1000000000,1000000000,3)[0]);
+        System.out.println("Final" + strat.minimax2(n,false,-1000000000,1000000000,2)[0]);
 
         //strat.printChildren(strat.setChildren(strat.createNode(0,7), boards,spots));
         //System.out.println(strat.numChildren(strat.setChildren(strat.createNode(0,7), boards,spots)));
