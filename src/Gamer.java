@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Gamer {
-    private final File movefile = new File("ref\\move_file");
-    private final File playerfile = new File("ref\\Walrus.go");
+    public final File movefile = new File("ref\\move_file");
+    public final File playerfile = new File("ref\\Walrus.go");
     private final File first_four_moves = new File("ref\\first_four_moves");
 
     private String ourName;
