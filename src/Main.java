@@ -5,7 +5,13 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        Gamer play = new Gamer("Walrus");
+        Gamer play = new Gamer("walrus");
+        Scanner getPath = new Scanner(System.in);
+        System.out.println("Enter the path to the referee (Ex: C:\\Users\\myname\\myfolder\\uttt_referee_v7\\):");
+        String refPath = getPath.nextLine();
+        if(!play.setRefPath(refPath)) {
+            return;
+        }
         play.addFirstMoves();
         //double timeAtSend = play.recMove.elapsedTime();
         while (true) {
