@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Gamer {
-    private final File movefile = new File("ref\\move_file");
-    public final File playerfile = new File("ref\\Walrus.go");
-    private final File first_four_moves = new File("ref\\first_four_moves");
+    private File movefile = new File("ref\\move_file");
+    public File playerfile = new File("ref\\Walrus.go");
+    private File first_four_moves = new File("ref\\first_four_moves");
 
     private String ourName;
     private int[][] gameBoard;
@@ -19,6 +19,18 @@ public class Gamer {
         this.gameBoard = new int[9][9];//Board-Spot?
         this.boardWinState = new int[9];
         this.finalFirstMove = new int[2];
+    }
+
+    public boolean setRefPath(String pathToRef) {
+        String pathToRefMod = pathToRef.endsWith("\\") ? pathToRef : pathToRef + "\\";
+        movefile = new File(pathToRefMod + "move_file");
+        playerfile = new File(pathToRefMod + "walrus.go");
+        first_four_moves = new File(pathToRefMod + "first_four_moves");
+        if(!(new File(pathToRefMod + "referee.py").exists())) {
+            System.out.println("This is not the path to ref");
+            return false;
+        }
+        return true;
     }
 
     public int[][] getGameBoard(){
