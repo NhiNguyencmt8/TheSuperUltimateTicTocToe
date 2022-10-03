@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Gamer {
-    public final File movefile = new File("ref\\move_file");
+    private final File movefile = new File("ref\\move_file");
     public final File playerfile = new File("ref\\Walrus.go");
     private final File first_four_moves = new File("ref\\first_four_moves");
 
@@ -76,7 +76,7 @@ public class Gamer {
         if (isBoardWon(gameBoard[board]) == 0) {
             if (getMove() == null && board == finalFirstMove[1]) {
                 return true;
-            } else if(gameBoard[board][spot] == 0 && board == getMove()[2]) {
+            } else if(gameBoard[board][spot] == 0 ){ //&& board == getMove()[2]) {
                 return true;
             }
         }
@@ -92,23 +92,23 @@ public class Gamer {
         //Check all row won
         // {0,1,2}, {3,4,5}, {6,7,8}
         for(int i = 0; i < 8; i+=3) {
-            if(board[i] == board[i+1] && board[i] == board[i+2]){
+            if(board[i] == board[i+1] && board[i] == board[i+2] && board[i] != 0){
                 return board[i];
             }
         }
         //Check all column won
         // {0,3,6}, {1,4,7}, {3,5,8}
         for(int i = 0; i < 3; i++) {
-            if(board[i] == board[i+3] && board[i+3] == board[i+6]){
+            if(board[i] == board[i+3] && board[i+3] == board[i+6] && board[i] != 0){
                 return board[i];
             }
         }
 
         //Check diagonal won
         // {0,4,8}, {2,4,6}
-        if(board[4] == board[0] && board[4] == board[8]){
+        if(board[4] == board[0] && board[4] == board[8] && board[4] != 0){
             return board[4];
-        } else if (board[4] == board[2] && board[4] == board[6]){
+        } else if (board[4] == board[2] && board[4] == board[6] && board[4] != 0){
             return board[4];
         }
 
@@ -119,13 +119,20 @@ public class Gamer {
      * Determines the win state of each board, then determines whether a player has won the entire game
      * @return the player number that won the game, or 0 if no player has won
      */
-    private int isGameWon(){
+    public int isGameWon(){
         //Time complexity
         for(int i = 0; i < 9; i++){
             boardWinState[i] = isBoardWon(gameBoard[i]);
         }
 
         return isBoardWon(boardWinState);
+    }
+    public void updateBoardWinState(){
+        for(int i = 0; i < 9; i++){
+            if (isBoardWon(gameBoard[i]) > 0){
+                boardWinState[i] = isBoardWon(gameBoard[i]);
+            }
+        }
     }
 
     public void addFirstMoves(){
@@ -183,12 +190,12 @@ public class Gamer {
      */
     public String sendMove(String playerName, int board, int spot) {
         String aMove = String.format("%s %s %s", playerName, board, spot);
-        while(!legalMove(board,spot)){
-            board = randMove();
-            spot = randMove();
-//            System.out.println("No possible move, retrying");
-//            System.out.println("New Board: " + board + " New Spot: " + spot);
-        }
+//        while(!legalMove(board,spot)){
+//            board = randMove();
+//            spot = randMove();
+////            System.out.println("No possible move, retrying");
+////            System.out.println("New Board: " + board + " New Spot: " + spot);
+//        }
         if (legalMove(board, spot)) {
             aMove = String.format("%s %s %s", playerName, board, spot);
             try {
@@ -242,10 +249,11 @@ public class Gamer {
      */
     public void ourMove(int board, int spot) {
         if (isGameWon() == 0){
-            //Put our move on our updated board (if legal)
             sendMove(ourName, board, spot);
+            //Put our move on our updated board (if legal)
             //Update our move on the board
 //            updateBoard();
+            System.out.println(recMove.elapsedTime());
         }
     }
 
