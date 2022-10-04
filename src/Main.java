@@ -22,6 +22,12 @@ public class Main {
 //            while(play.recMove != null && play.recMove.elapsedTime() - timeAtSend < 200) {
 //            }
             int[] move = play.updateBoard();
+
+            if(play.legalMove(move[0],move[1])){ //check if the move is legal
+                //If the opponent move is not legal then -> we won the game
+                break;
+            }
+
             int bestSpot = -1;
             int depth = 1;
             int maxDepth = play.countRemainingMoves(play.getGameBoard()[move[1]]);
