@@ -24,9 +24,9 @@ public class Strategy {
      * @param board the board being checked for its win state
      * @return 1 if ourPlayer won the board, -1 if the other player won the board, 0 if no one won
      */
-    public int utility(int ourPlayer, int[] board) {
+    public int utility(int player, int[] board) {
         int winner = new Gamer("").isBoardWon(board);
-        if(winner == ourPlayer) {
+        if(winner == player) {
            return 1;
         } else if (winner == 0) {
             return 0;
