@@ -1,47 +1,27 @@
 import java.util.ArrayList;
 import java.util.List;
 
-    public class Node implements Comparable<Node>{
+    public class Node {
         public int player;
-        public int hValue;
         public int spot;
         public int cBoard;
         public int[] boardConfig;
         public List<Node> children;
-        public Node rootNode;
-        public boolean isRoot = true;
         public Node(int player, int board, int spot, int[] boardConfig) {
             this.player = player;
             this.cBoard = board;
             this.spot = spot;
             children = new ArrayList<Node>();
             this.boardConfig = boardConfig;
-            this.rootNode = this;
 
         }
 
-
-        public Node getRootNode(int player){
-            if(rootNode != null && player == 1 ){
-                if(rootNode.rootNode != null ){
-                    return rootNode.getRootNode(player);
-                }
-            } else if (rootNode != null && player == 2){
-                if(rootNode.rootNode.rootNode != null ){
-                    return rootNode.rootNode.getRootNode(player);
-                }
-            }
-
-
-                return this;
-        }
-
-        // what do we want to compare for a node
-        @Override
-        public int compareTo(Node o) {
-            return 0;
-        }
-
+        /**
+         * Adds a child to children with a new boardConfig where the given player occupies the given spot
+         * @param n the node to add the child to
+         * @param spot the spot to replace on the board
+         * @param player the player occupying that spot on the board
+         */
         public void addChild(Node n, int spot, int player){
             int[] newConfig = new int[9];
             for (int i = 0; i < n.boardConfig.length; i++){
@@ -51,21 +31,8 @@ import java.util.List;
             Node c1 = new Node(player, n.cBoard, spot, newConfig);
             n.children.add(c1);
             if (n.player == 1 || n.player == 2){
-                c1.rootNode = n.rootNode;
             }else{
-                c1.rootNode = c1;
             }
         }
-
-        public Node getRoot(Node n){
-            return n.rootNode;
-        }
-
-        public int[] modifyBoard(int[] pBoard, int i, int player){
-            int[] newBoard = pBoard;
-            newBoard[i] = player;
-            return newBoard;
-        }
-
 
     }

@@ -9,18 +9,27 @@ public class Gamer {
     private File first_four_moves = new File("ref\\first_four_moves");
 
     private String ourName;
-    private int[][] gameBoard;
+    private int[][] ultimateBoard;
     private int[] boardWinState; //1x9 matrix that indicates the win state of the big board
     public Stopwatch recMove;
     private int[] finalFirstMove;
 
+    /**
+     * Gamer initialization function
+     * @param ourName the name that will be used and stored on the move file
+     */
     public Gamer(String ourName) {
         this.ourName = ourName;
-        this.gameBoard = new int[9][9];//Board-Spot?
+        this.ultimateBoard = new int[9][9];
         this.boardWinState = new int[9];
         this.finalFirstMove = new int[2];
     }
 
+    /**
+     * Set the directory path to the Referee file
+     * @param pathToRef the directory path
+     * @return a boolean to determined if the path to the Referee is correct or not
+     */
     public boolean setRefPath(String pathToRef) {
         String pathToRefMod = pathToRef.endsWith("\\") ? pathToRef : pathToRef + "\\";
         movefile = new File(pathToRefMod + "move_file");
@@ -33,48 +42,38 @@ public class Gamer {
         return true;
     }
 
-    public int[][] getGameBoard(){
-        return  gameBoard;
+    /**
+     * Function used to get the game board of current game
+     * @return the Game Board
+     */
+    public int[][] getUltimateBoard(){
+        return  ultimateBoard;
     }
 
-    public  int[] getBoardWinState(){
+    /**
+     * Function return the board win states of the small boards on the big ultimate board
+     * @return a 1x9 array that each element represent the win state of the board with that index on the ultimate board
+     */
+    public int[] getBoardWinState(){
         return boardWinState;
     }
 
     /**
-     * Retrieve the value of ourName
-     * @return ourName
-     */
-    public String getOurName() {
-        return ourName;
-    }
-
-    /**
      * Updates the board based on the most recent move received
-     * @return true if board successfully updated
+     * @return an array containing the received move in the form of {player, moveBoard, moveSpot}
      */
     public int[] updateBoard() {
+        //Retrieve the opponent move from move_file
         int[] move = getMove();
-        if(move == null) {
-            return finalFirstMove;
-        }
+        if(move == null) { return finalFirstMove; }
         int player = move[0];
         int board = move[1];
         int spot = move[2];
 
         //Update the move on our board
-        gameBoard[board][spot] = player;
+        ultimateBoard[board][spot] = player;
         displayBoard();
         return new int[]{move[1], move[2]};
-    }
-
-    /**
-     * Generates an int for a random move
-     * @return a random integer between 0 and 8
-     */
-    public int randMove() {
-        // random int from 0-8
-        return (int) (Math.random() * 9);
     }
 
     /**
@@ -84,11 +83,12 @@ public class Gamer {
      * @return true if the move can be made on the game board
      */
     public boolean legalMove(int board, int spot) {
-        //First check if the board not won already
-        if (isBoardWon(gameBoard[board]) == 0) {
+        //First check if the board is not won already
+        if (isBoardWon(ultimateBoard[board]) == 0) {
+            // True if the AI goes first and a legal board is chosen. Else true if the board spot is not occupied by a player.
             if (getMove() == null && board == finalFirstMove[1]) {
                 return true;
-            } else if(gameBoard[board][spot] == 0 ){ //&& board == getMove()[2]) {
+            } else if(ultimateBoard[board][spot] == 0 ){ //&& board == getMove()[2]) {
                 return true;
             }
         }
@@ -108,6 +108,7 @@ public class Gamer {
                 return board[i];
             }
         }
+
         //Check all column won
         // {0,3,6}, {1,4,7}, {3,5,8}
         for(int i = 0; i < 3; i++) {
@@ -123,7 +124,6 @@ public class Gamer {
         } else if (board[4] == board[2] && board[4] == board[6] && board[4] != 0){
             return board[4];
         }
-
         return 0;
     }
 
@@ -132,30 +132,32 @@ public class Gamer {
      * @return the player number that won the game, or 0 if no player has won
      */
     public int isGameWon(){
-        //Time complexity
-        for(int i = 0; i < 9; i++){
-            boardWinState[i] = isBoardWon(gameBoard[i]);
-        }
-
+        for(int i = 0; i < 9; i++){ boardWinState[i] = isBoardWon(ultimateBoard[i]); }
         return isBoardWon(boardWinState);
     }
+
+    /**
+     * Function loop through all the boards on the Ultimate board and store the win state value for that board according to its index on the big board
+     */
     public void updateBoardWinState(){
         for(int i = 0; i < 9; i++){
-            if (isBoardWon(gameBoard[i]) > 0){
-                boardWinState[i] = isBoardWon(gameBoard[i]);
+            if (isBoardWon(ultimateBoard[i]) > 0){
+                boardWinState[i] = isBoardWon(ultimateBoard[i]);
             }
         }
     }
 
+    /**
+     *  Reads the first_four_moves file and places those moves on the gameBoard
+     */
     public void addFirstMoves(){
-        try  {
-            while (!first_four_moves.exists()){
-            }
+        try {
+            while (!first_four_moves.exists()){}
             Scanner move = new Scanner(first_four_moves);
             String[] moves = new String[4];
             for (int i = 0; i < moves.length; i++){
                 String[] arr = move.nextLine().split(" ");
-                gameBoard[Integer.parseInt(arr[1])][Integer.parseInt(arr[2])] = arr[0].equals(ourName) ? 1 : 2;
+                ultimateBoard[Integer.parseInt(arr[1])][Integer.parseInt(arr[2])] = arr[0].equals(ourName) ? 1 : 2;
                 if (i == 3){
                     finalFirstMove[0] = Integer.parseInt(arr[1]);
                     finalFirstMove[1] = Integer.parseInt(arr[2]);
@@ -165,13 +167,14 @@ public class Gamer {
             System.out.println("File " + first_four_moves + "not found");
         }
     }
+
     /**
      * Retrieves the opponent's move from movefile
      * @return an array of format {player_number, board, spot}
      */
     public int[] getMove() {
-        //need to check null
         try {
+            // wait for the opponent's move and the AI's go file to arrive.
             while (!movefile.exists() || !playerfile.exists()) {
             }
             recMove = new Stopwatch(); // 10 sec timer starts
@@ -180,7 +183,6 @@ public class Gamer {
             if (move.hasNextLine()) {
                 String[] arr = move.nextLine().split(" ");
                 if (arr[0].equals(ourName)) {
-                    //We are the player 1
                     return new int[]{1, Integer.parseInt(arr[1]), Integer.parseInt(arr[2])};
                 } else {
                     return new int[]{2, Integer.parseInt(arr[1]), Integer.parseInt(arr[2])};
@@ -202,12 +204,6 @@ public class Gamer {
      */
     public String sendMove(String playerName, int board, int spot) {
         String aMove = String.format("%s %s %s", playerName, board, spot);
-//        while(!legalMove(board,spot)){
-//            board = randMove();
-//            spot = randMove();
-////            System.out.println("No possible move, retrying");
-////            System.out.println("New Board: " + board + " New Spot: " + spot);
-//        }
         if (legalMove(board, spot)) {
             aMove = String.format("%s %s %s", playerName, board, spot);
             try {
@@ -219,12 +215,11 @@ public class Gamer {
                 return "Move not sent";
             }
             if (playerName.equals(ourName)) {
-                gameBoard[board][spot] = 1;
+                ultimateBoard[board][spot] = 1;
             } else {
-                gameBoard[board][spot] = 2;
+                ultimateBoard[board][spot] = 2;
             }
         } else {
-
             System.out.println("No possible move");
         }
         return aMove;
@@ -232,22 +227,19 @@ public class Gamer {
 
     /**
      * Prints the current state of gameBoard
-     * TODO also print what boards have been won and who won them
      */
     public void displayBoard() {
         //Printing the original 9x9 board with annotation 1 as our move and 2 as our player's move
-        //updateBoard(); // Update the board before printing
-
         String border = "---------------------\n";
-        String row0 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][0],gameBoard[0][1],gameBoard[0][2],gameBoard[1][0],gameBoard[1][1],gameBoard[1][2],gameBoard[2][0],gameBoard[2][1],gameBoard[2][2]);
-        String row1 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][3],gameBoard[0][4],gameBoard[0][5],gameBoard[1][3],gameBoard[1][4],gameBoard[1][5],gameBoard[2][3],gameBoard[2][4],gameBoard[2][5]);
-        String row2 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[0][6],gameBoard[0][7],gameBoard[0][8],gameBoard[1][6],gameBoard[1][7],gameBoard[1][8],gameBoard[2][6],gameBoard[2][7],gameBoard[2][8]);
-        String row3 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[3][0],gameBoard[3][1],gameBoard[3][2],gameBoard[4][0],gameBoard[4][1],gameBoard[4][2],gameBoard[5][0],gameBoard[5][1],gameBoard[5][2]);
-        String row4 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[3][3],gameBoard[3][4],gameBoard[3][5],gameBoard[4][3],gameBoard[4][4],gameBoard[4][5],gameBoard[5][3],gameBoard[5][4],gameBoard[5][5]);
-        String row5 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[3][6],gameBoard[3][7],gameBoard[3][8],gameBoard[4][6],gameBoard[4][7],gameBoard[4][8],gameBoard[5][6],gameBoard[5][7],gameBoard[5][8]);
-        String row6 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][0],gameBoard[6][1],gameBoard[6][2],gameBoard[7][0],gameBoard[7][1],gameBoard[7][2],gameBoard[8][0],gameBoard[8][1],gameBoard[8][2]);
-        String row7 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][3],gameBoard[6][4],gameBoard[6][5],gameBoard[7][3],gameBoard[7][4],gameBoard[7][5],gameBoard[8][3],gameBoard[8][4],gameBoard[8][5]);
-        String row8 = String.format("%s %s %s | %s %s %s | %s %s %s\n",gameBoard[6][6],gameBoard[6][7],gameBoard[6][8],gameBoard[7][6],gameBoard[7][7],gameBoard[7][8],gameBoard[8][6],gameBoard[8][7],gameBoard[8][8]);
+        String row0 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[0][0],ultimateBoard[0][1],ultimateBoard[0][2],ultimateBoard[1][0],ultimateBoard[1][1],ultimateBoard[1][2],ultimateBoard[2][0],ultimateBoard[2][1],ultimateBoard[2][2]);
+        String row1 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[0][3],ultimateBoard[0][4],ultimateBoard[0][5],ultimateBoard[1][3],ultimateBoard[1][4],ultimateBoard[1][5],ultimateBoard[2][3],ultimateBoard[2][4],ultimateBoard[2][5]);
+        String row2 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[0][6],ultimateBoard[0][7],ultimateBoard[0][8],ultimateBoard[1][6],ultimateBoard[1][7],ultimateBoard[1][8],ultimateBoard[2][6],ultimateBoard[2][7],ultimateBoard[2][8]);
+        String row3 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[3][0],ultimateBoard[3][1],ultimateBoard[3][2],ultimateBoard[4][0],ultimateBoard[4][1],ultimateBoard[4][2],ultimateBoard[5][0],ultimateBoard[5][1],ultimateBoard[5][2]);
+        String row4 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[3][3],ultimateBoard[3][4],ultimateBoard[3][5],ultimateBoard[4][3],ultimateBoard[4][4],ultimateBoard[4][5],ultimateBoard[5][3],ultimateBoard[5][4],ultimateBoard[5][5]);
+        String row5 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[3][6],ultimateBoard[3][7],ultimateBoard[3][8],ultimateBoard[4][6],ultimateBoard[4][7],ultimateBoard[4][8],ultimateBoard[5][6],ultimateBoard[5][7],ultimateBoard[5][8]);
+        String row6 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[6][0],ultimateBoard[6][1],ultimateBoard[6][2],ultimateBoard[7][0],ultimateBoard[7][1],ultimateBoard[7][2],ultimateBoard[8][0],ultimateBoard[8][1],ultimateBoard[8][2]);
+        String row7 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[6][3],ultimateBoard[6][4],ultimateBoard[6][5],ultimateBoard[7][3],ultimateBoard[7][4],ultimateBoard[7][5],ultimateBoard[8][3],ultimateBoard[8][4],ultimateBoard[8][5]);
+        String row8 = String.format("%s %s %s | %s %s %s | %s %s %s\n",ultimateBoard[6][6],ultimateBoard[6][7],ultimateBoard[6][8],ultimateBoard[7][6],ultimateBoard[7][7],ultimateBoard[7][8],ultimateBoard[8][6],ultimateBoard[8][7], ultimateBoard[8][8]);
 
         System.out.println(row0 + row1 + row2 + border +
                 row3 + row4 + row5 + border +
@@ -262,13 +254,15 @@ public class Gamer {
     public void ourMove(int board, int spot) {
         if (isGameWon() == 0){
             sendMove(ourName, board, spot);
-            //Put our move on our updated board (if legal)
-            //Update our move on the board
-//            updateBoard();
             System.out.println(recMove.elapsedTime());
         }
     }
 
+    /**
+     * Function count and return the remaining moves by counting the empty spots on the board
+     * @param board the board input
+     * @return numbers of empty spots on the board that player can move on
+     */
     public int countRemainingMoves(int[] board) {
         int count = 0;
         for(int i = 0; i < 9; i++) {
@@ -279,6 +273,10 @@ public class Gamer {
         return count;
     }
 
+    /**
+     * Loops through the boardWinStates and determines if the overall board is full or not
+     * @return true if all spots on the board are fulled
+     */
     public boolean bigBoardIsFull(){
         updateBoardWinState();
         if (countRemainingMoves(boardWinState) == 0){
@@ -286,5 +284,4 @@ public class Gamer {
         }
         return false;
     }
-
 }

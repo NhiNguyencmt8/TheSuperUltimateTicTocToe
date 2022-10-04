@@ -1,15 +1,13 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.lang.*;
 
 public class StrategyTests {
 
     @Test
     public void testEvaluate() {
-        Strategy strat = new Strategy(null,null);
+        Strategy strat = new Strategy();
         // 0 1 2
         // 1 1 2
         // 1 0 0
@@ -73,21 +71,21 @@ public class StrategyTests {
         System.out.println("8 p2" + strat.evaluate(2, board8));
     }
 
-    @Test
-    public void testMinimaxNull(){
-        Strategy strat = new Strategy(new int[9][9], new int[9]);
-        //Assert.assertNull(strat.minimax(null, true, 0, 0, 0));
-    }
+//    @Test
+//    public void testMinimaxNull(){
+//        Strategy strat = new Strategy(new int[9][9], new int[9]);
+//        //Assert.assertNull(strat.minimax(null, true, 0, 0, 0));
+//    }
 
-    @Test
-    public void testMinimaxBlankBoardTerminal(){
-        Strategy strat = new Strategy(new int[9][9], new int[9]);
-        strat.currentBoard = 0;
-        //System.out.println(strat.getChildren(strat.createNode(1,0)));
-        //System.out.println(strat.getChildren(strat.createNode(1,0)).isEmpty());
-        //Assert.assertEquals(0, strat.getSpot(strat.minimax(strat.createNode(1,0), true, 0, 0, 0)));
-        //Assert.assertEquals(0, strat.getBoard(strat.minimax(strat.createNode(0,0), true, 0, 0, 0)));
-    }
+//    @Test
+//    public void testMinimaxBlankBoardTerminal(){
+//        Strategy strat = new Strategy(new int[9][9], new int[9]);
+//        strat.currentBoard = 0;
+//        //System.out.println(strat.getChildren(strat.createNode(1,0)));
+//        //System.out.println(strat.getChildren(strat.createNode(1,0)).isEmpty());
+//        //Assert.assertEquals(0, strat.getSpot(strat.minimax(strat.createNode(1,0), true, 0, 0, 0)));
+//        //Assert.assertEquals(0, strat.getBoard(strat.minimax(strat.createNode(0,0), true, 0, 0, 0)));
+//    }
 
     @Test
     public void testMinimaxTerminal(){
@@ -98,7 +96,7 @@ public class StrategyTests {
         gameBoard[4][5] = 2;
 
         int[] ourBoard = gameBoard[0];
-        Strategy strat = new Strategy(gameBoard,new int[9]);
+        Strategy strat = new Strategy();
         strat.currentBoard = 0;
         //Assert.assertEquals(4,strat.getSpot(strat.minimax(strat.createNode(0,4),true,0,0,0, strat.modifyBoard(ourBoard,4,1))));
         //Assert.assertEquals(65,strat.getHValue(strat.minimax(strat.createNode(0,4),true,0,0,0, strat.modifyBoard(ourBoard,4,1))));
@@ -125,7 +123,7 @@ public class StrategyTests {
         int[] ourBoard = gameBoard[0];
 
 
-        Strategy strat = new Strategy(gameBoard, new int[9]);
+        Strategy strat = new Strategy();
 
 
         Node n = new Node(2,0,0, ourBoard);
@@ -165,7 +163,7 @@ public class StrategyTests {
 
 
         //System.out.println("Final" + strat.doMinimax(n,true,1000000000,-1000000000,3).spot);
-        System.out.println("Final" + strat.minimax2(n,false,-1000000000,1000000000,2)[0]);
+        System.out.println("Final" + strat.minimax(n,false,-1000000000,1000000000,2)[0]);
 
         //strat.printChildren(strat.setChildren(strat.createNode(0,7), boards,spots));
         //System.out.println(strat.numChildren(strat.setChildren(strat.createNode(0,7), boards,spots)));
@@ -191,7 +189,7 @@ public class StrategyTests {
 
         int[] ourBoard = gameBoard[0];
 
-        Strategy strat = new Strategy(gameBoard, new int[9]);
+        Strategy strat = new Strategy();
         int[] boards = {0,0,0};
         int[] spots = {2,5,3};
 
@@ -207,31 +205,5 @@ public class StrategyTests {
 
     }
 
-//    @Test
-//    public void testFindBestMove(){
-//        int[][] gameBoard = new int[9][9];
-//        gameBoard[0][0] = 1;
-//        gameBoard[0][3] = 1;
-//        gameBoard[0][4] = 2;
-//
-//        //board 0
-//        // 1 0 0
-//        // 1 2 0
-//        // 0 0 0
-//
-//        int[] ourBoard = gameBoard[0];
-//
-//        Strategy strat = new Strategy(gameBoard, new int[9]);
-//        int[] boards = {0,0,0};
-//        int[] spots = {2,5,3};
-//
-//        strat.currentBoard = 0;
-//
-//
-//        //Assert.assertEquals(0,strat.getBoard(strat.minimax(strat.setChildren(strat.createNode(0,7), boards,spots),true,0,0,0,strat.modifyBoard(ourBoard,7,1))));
-//        Assert.assertEquals(6,strat.getSpot(strat.findBestMove(ourBoard,1)));
-//        //Assert.assertEquals(-65,strat.getHValue(strat.minimax(strat.setChildren(strat.createNode(0,7), boards,spots),true,0,0,0,strat.modifyBoard(ourBoard,7,1))));
-//
-//    }
 
 }
