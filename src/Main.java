@@ -47,13 +47,14 @@ public class Main {
                         //Then choose the best board
                         int[] bestBoard =  {-1,-1}; //hValue - Spot
                         for (int i = 0; i < 9; i ++){
-                            if(play.getBoardWinState()[i] > 0){
-                                int evalBoard = strategy.evaluate(1,play.getUltimateBoard()[i]);
-                                if(evalBoard > bestBoard[0]){
-                                    bestBoard[0] = evalBoard;
-                                    bestBoard[1] = i;
+                                if (play.isBoardWon(play.getUltimateBoard()[i]) == 0
+                                    && play.countRemainingMoves(play.getUltimateBoard()[i]) != 0) {
+                                    int evalBoard = strategy.evaluate(1, play.getUltimateBoard()[i]);
+                                    if (evalBoard > bestBoard[0]) {
+                                        bestBoard[0] = evalBoard;
+                                        bestBoard[1] = i;
+                                    }
                                 }
-                            }
                         }
 
 

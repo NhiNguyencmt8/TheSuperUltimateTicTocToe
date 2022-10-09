@@ -132,8 +132,14 @@ public class Gamer {
      * @return the player number that won the game, or 0 if no player has won
      */
     public int isGameWon(){
-        for(int i = 0; i < 9; i++){ boardWinState[i] = isBoardWon(ultimateBoard[i]); }
-        return isBoardWon(boardWinState);
+        int[] boardState = new int[9];
+        for(int i = 0; i < 9; i++){
+            int boardWonState = isBoardWon(getUltimateBoard()[i]);
+            if( boardWonState> 0){
+                boardState[i] = boardWonState;
+            }
+        }
+        return isBoardWon(boardState);
     }
 
     /**
