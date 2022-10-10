@@ -47,8 +47,11 @@ public class Main {
                         //Then choose the best board
                         int[] bestBoard =  {-1,-1}; //hValue - Spot
                         for (int i = 0; i < 9; i ++){
-                                if (play.isBoardWon(play.getUltimateBoard()[i]) == 0
-                                    && play.countRemainingMoves(play.getUltimateBoard()[i]) != 0) {
+                            System.out.println("Board won state at" + i + "is" + play.isBoardWon(play.getUltimateBoard()[i]));
+                            System.out.println("Board remaining moves at" + i + "is" + play.countRemainingMoves(play.getUltimateBoard()[i]));
+
+                            if (play.isBoardWon(play.getUltimateBoard()[i]) == 0
+                                    && play.countRemainingMoves(play.getUltimateBoard()[i]) > 0) {
                                     int evalBoard = strategy.evaluate(1, play.getUltimateBoard()[i]);
                                     if (evalBoard > bestBoard[0]) {
                                         bestBoard[0] = evalBoard;
@@ -57,7 +60,9 @@ public class Main {
                                 }
                         }
 
-
+                        if(bestBoard[1] < 0){
+                            bestBoard[1] = play.returnAPossibleBoard();
+                        }
                         strategy.currentBoard = bestBoard[1];
                         System.out.println("Time to choose another board, at " + strategy.currentBoard);
 
@@ -79,7 +84,7 @@ public class Main {
 
                 //Run the for loop to do iterative minimax alpha-beta pruning
                 strategy.currentBoard = move[1];
-                //While the stopWatch is less than 7 seconds or depth have not reach maxDepth yet
+                //While the stopWatch is less than 7 seconds or depth have not reached maxDepth yet
                 while (play.recMove.elapsedTime() < 7 && depth != maxDepth) { // 7 is tentative
                     Node rootNode = new Node(2, move[1], 0, play.getUltimateBoard()[move[1]]);
                     //Using minimax to determine the best spot on the board
@@ -88,6 +93,9 @@ public class Main {
                 }
                 System.out.println("---------------Our board to move in: " + move[1]);
                 //Make the move on the board that is the spot of the previous player + best move the AI just generated
+                if(bestSpot < 0){
+                    bestSpot = play.returnAPossibleMove(move[1]);
+                }
                 play.ourMove(move[1], bestSpot);
             }
             while(play.playerfile.exists()){}

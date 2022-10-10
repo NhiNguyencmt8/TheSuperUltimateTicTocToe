@@ -9,7 +9,7 @@ public class Gamer {
     private File first_four_moves = new File("ref\\first_four_moves");
 
     private String ourName;
-    private int[][] ultimateBoard;
+    public int[][] ultimateBoard;
     private int[] boardWinState; //1x9 matrix that indicates the win state of the big board
     public Stopwatch recMove;
     private int[] finalFirstMove;
@@ -289,5 +289,27 @@ public class Gamer {
             return true;
         }
         return false;
+    }
+
+    public int returnAPossibleMove( int board){
+        int possibleMove = 0;
+        for (int i = 0; i <9; i++){
+            if(ultimateBoard[board][i] == 0){
+                possibleMove = i;
+                break;
+            }
+        }
+        return possibleMove;
+    }
+
+    public int returnAPossibleBoard(){
+        int possibleBoard = 0;
+        for (int i = 0; i <9; i++){
+            if(isBoardWon(ultimateBoard[i]) > 0){
+                possibleBoard = i;
+                break;
+            }
+        }
+        return possibleBoard;
     }
 }
