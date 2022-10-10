@@ -53,6 +53,7 @@ public class Main {
                             if (play.isBoardWon(play.getUltimateBoard()[i]) == 0
                                     && play.countRemainingMoves(play.getUltimateBoard()[i]) > 0) {
                                     int evalBoard = strategy.evaluate(1, play.getUltimateBoard()[i]);
+                                    if (evalBoard < 0) {evalBoard = 0;}
                                     if (evalBoard > bestBoard[0]) {
                                         bestBoard[0] = evalBoard;
                                         bestBoard[1] = i;
