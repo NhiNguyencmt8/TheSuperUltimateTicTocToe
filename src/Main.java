@@ -4,14 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         //Setting up our player
-        Gamer play = new Gamer("walrus");
-        //Get the path to the ref
-        Scanner getPath = new Scanner(System.in);
-        System.out.println("Enter the path to the referee (Ex: C:\\Users\\myname\\myfolder\\uttt_referee_v7\\):");
-        String refPath = getPath.nextLine();
-        if(!play.setRefPath(refPath)) {
-            return;
-        }
+        Gamer play = new Gamer("Walrus");
         //Add the moves from first_four_moves
         play.addFirstMoves();
 

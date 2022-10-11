@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Gamer {
-    private File movefile = new File("ref\\move_file");
-    public File playerfile = new File("ref\\Walrus.go");
-    private File first_four_moves = new File("ref\\first_four_moves");
+    private File movefile = new File("move_file");
+    public File playerfile = new File("Walrus.go");
+    private File first_four_moves = new File("first_four_moves");
 
     private String ourName;
     public int[][] ultimateBoard;
@@ -23,23 +23,6 @@ public class Gamer {
         this.ultimateBoard = new int[9][9];
         this.boardWinState = new int[9];
         this.finalFirstMove = new int[2];
-    }
-
-    /**
-     * Set the directory path to the Referee file
-     * @param pathToRef the directory path
-     * @return a boolean to determined if the path to the Referee is correct or not
-     */
-    public boolean setRefPath(String pathToRef) {
-        String pathToRefMod = pathToRef.endsWith("\\") ? pathToRef : pathToRef + "\\";
-        movefile = new File(pathToRefMod + "move_file");
-        playerfile = new File(pathToRefMod + "walrus.go");
-        first_four_moves = new File(pathToRefMod + "first_four_moves");
-        if(!(new File(pathToRefMod + "referee.py").exists())) {
-            System.out.println("This is not the path to ref");
-            return false;
-        }
-        return true;
     }
 
     /**
